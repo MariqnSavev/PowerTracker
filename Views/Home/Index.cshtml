@@ -1,8 +1,19 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home Page"; // Заглавие на страницата
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h2>Welcome to the Home Page!</h2>
+
+<p>This is the main page of your application.</p>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <p>Hello, @User.Identity.Name! You are logged in.</p>
+}
+else
+{
+    <p>You are not logged in. Please <a asp-controller="Account" asp-action="Login">log in</a>.</p>
+}
+
+<a asp-controller="User" asp-action="Profile">Go to your profile</a>
+

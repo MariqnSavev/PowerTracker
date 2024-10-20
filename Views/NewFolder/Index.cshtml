@@ -1,0 +1,26 @@
+﻿@model IEnumerable<ApplicationUser>
+
+<h2>Admin Panel</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+
+        {
+            <tr>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>
+                    <a asp-controller="Admin" asp-action="ManageUsers" asp-route-id="@user.Id">Manage</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

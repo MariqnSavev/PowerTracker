@@ -1,0 +1,25 @@
+﻿@model BoxingAppDiploma.ViewModels.EditProfileViewModel
+
+<h2>Редактиране на профила</h2>
+
+<form asp-action="EditProfile" method="post">
+    <div>
+        <label asp-for="Name"></label>
+        <input asp-for="Name" />
+        <span asp-validation-for="Name"></span>
+    </div>
+    <div>
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email"></span>
+    </div>
+    <button type="submit">Запази промени</button>
+</form>
+
+<div>
+    @if (ViewBag.Message != null)
+
+    {
+        <p>@ViewBag.Message</p>
+    }
+</div>
