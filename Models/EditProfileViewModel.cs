@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-public class EditProfileViewModel
+﻿namespace BoxingAppDiploma.ViewModels
 {
-    [Required]
-    public string Name { get; set; } // Име на потребителя
-
-    [EmailAddress]
-    [Required]
-    public string Email { get; set; } // Имейл на потребителя
+    public class EditProfileViewModel
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string Name { get; internal set; }
+        // Добави всички полета, които искаш да редактираш в профила.
+    }
 }

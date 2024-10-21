@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿
+using Microsoft.AspNetCore.Identity;
 
-public class ApplicationUser : IdentityUser
+namespace BoxingAppDiploma.Models
 {
-    // Можеш да добавиш свои свойства, ако е необходимо
-    public string FullName { get; set; } // Име на потребителя
+    public class ApplicationUser : IdentityUser
+    {
+        public string FullName { get; set; }
+    }
 }

@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using BoxingAppDiploma.Models; // Път до модела ApplicationUser
-using BoxingAppDiploma.Models; // Път до ViewModels
+using BoxingAppDiploma.Models;
+using BoxingAppDiploma.ViewModels; // Път до модела ApplicationUser
 
 
 namespace BoxingAppDiploma.Controllers
