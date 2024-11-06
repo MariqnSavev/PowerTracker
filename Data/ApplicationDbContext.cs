@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using BoxingAppDiploma.Models;
 
 namespace BoxingAppDiploma.Data
 {
@@ -9,5 +10,7 @@ namespace BoxingAppDiploma.Data
             : base(options)
         {
         }
+        public DbSet<BoxingAppDiploma.Models.Training>? Training { get; set; }
+        public DbSet<BoxingAppDiploma.Models.Diet>? Diet { get; set; }
     }
 }
