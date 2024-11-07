@@ -1,37 +1,163 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BoxingAppDiploma.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using BoxingAppDiploma.Data;
+using BoxingAppDiploma.Models;
 
 namespace BoxingAppDiploma.Controllers
 {
-    public class TrainingController : Controller
+    public class TrainingsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        // Конструктор за инжектиране на контекста
-        public TrainingController(ApplicationDbContext context)
+        public TrainingsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Training/Create
-        public IActionResult Create()
+        // GET: Trainings
+        public async Task<IActionResult> Index()
         {
-            return View();  // Търси изглед в Views/Training/Create.cshtml
+              return _context.Training != null ? 
+                          View(await _context.Training.ToListAsync()) :
+                          Problem("Entity set 'ApplicationDbContext.Training'  is null.");
         }
 
-        // POST: Training/Create
+        // GET: Trainings/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null || _context.Training == null)
+            {
+                return NotFound();
+            }
+
+            var training = await _context.Training
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (training == null)
+            {
+                return NotFound();
+            }
+
+            return View(training);
+        }
+
+        // GET: Trainings/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Trainings/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Training training)
+        public async Task<IActionResult> Create([Bind("Id,Date,Description,DurationMinutes,CaloriesBurned")] Training training)
         {
             if (ModelState.IsValid)
             {
-                _context.Training.Add(training);  // Добавяме тренировката в контекста
-                _context.SaveChanges();  // Записваме промените в базата данни
-                return RedirectToAction(nameof(Index));  // Пренасочваме към Index
+                _context.Add(training);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-            return View(training);  // Ако има грешки, връщаме към формата
+            return View(training);
+        }
+
+        // GET: Trainings/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null || _context.Training == null)
+            {
+                return NotFound();
+            }
+
+            var training = await _context.Training.FindAsync(id);
+            if (training == null)
+            {
+                return NotFound();
+            }
+            return View(training);
+        }
+
+        // POST: Trainings/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Description,DurationMinutes,CaloriesBurned")] Training training)
+        {
+            if (id != training.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(training);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!TrainingExists(training.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(training);
+        }
+
+        // GET: Trainings/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null || _context.Training == null)
+            {
+                return NotFound();
+            }
+
+            var training = await _context.Training
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (training == null)
+            {
+                return NotFound();
+            }
+
+            return View(training);
+        }
+
+        // POST: Trainings/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            if (_context.Training == null)
+            {
+                return Problem("Entity set 'ApplicationDbContext.Training'  is null.");
+            }
+            var training = await _context.Training.FindAsync(id);
+            if (training != null)
+            {
+                _context.Training.Remove(training);
+            }
+            
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool TrainingExists(int id)
+        {
+          return (_context.Training?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

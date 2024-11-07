@@ -1,34 +1,53 @@
 ﻿@model IEnumerable<BoxingAppDiploma.Models.Training>
 
 @{
-    ViewData["Title"] = "Trainings";
+    ViewData["Title"] = "Index";
 }
 
-<h1>Trainings</h1>
+<h1>Index</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Create New Training</a>
+    <a asp-action="Create">Create New</a>
 </p>
-
 <table class="table">
     <thead>
         <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Duration (minutes)</th>
-            <th>Calories Burned</th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DurationMinutes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CaloriesBurned)
+            </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var training in Model)
-
-        {
-            <tr>
-                <td>@training.Date.ToString("yyyy-MM-dd")</td>
-                <td>@training.Description</td>
-                <td>@training.DurationMinutes</td>
-                <td>@training.CaloriesBurned</td>
-            </tr>
-        }
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DurationMinutes)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CaloriesBurned)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
     </tbody>
 </table>
