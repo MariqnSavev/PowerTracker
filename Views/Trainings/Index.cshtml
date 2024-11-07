@@ -1,13 +1,16 @@
 ﻿@model IEnumerable<BoxingAppDiploma.Models.Training>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Trainings";
 }
 
+<h1>Trainings</h1>
 
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Training</a>
+</p>
 
-<h2>Training Log</h2>
-<table>
+<table class="table">
     <thead>
         <tr>
             <th>Date</th>
@@ -18,9 +21,10 @@
     </thead>
     <tbody>
         @foreach (var training in Model)
+
         {
             <tr>
-                <td>@training.Date.ToShortDateString()</td>
+                <td>@training.Date.ToString("yyyy-MM-dd")</td>
                 <td>@training.Description</td>
                 <td>@training.DurationMinutes</td>
                 <td>@training.CaloriesBurned</td>
@@ -28,5 +32,3 @@
         }
     </tbody>
 </table>
-<a href="/Training/Create">Add New Training</a>
-

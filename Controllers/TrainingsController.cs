@@ -1,46 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using BoxingAppDiploma.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using BoxingAppDiploma.Models;
+using BoxingAppDiploma.Data;
 
 namespace BoxingAppDiploma.Controllers
 {
-    public class TrainingsController : Controller
+    public class TrainingController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public TrainingsController(ApplicationDbContext context)
+        // Конструктор за инжектиране на контекста
+        public TrainingController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public IActionResult Index()
-        {
-            var trainings = _context.Training.ToList();
-            return View(trainings);
-        }
-
+        // GET: Training/Create
         public IActionResult Create()
         {
-            return View();
+            return View();  // Търси изглед в Views/Training/Create.cshtml
         }
 
+        // POST: Training/Create
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(Training training)
         {
             if (ModelState.IsValid)
             {
-                _context.Training.Add(training);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+                _context.Training.Add(training);  // Добавяме тренировката в контекста
+                _context.SaveChanges();  // Записваме промените в базата данни
+                return RedirectToAction(nameof(Index));  // Пренасочваме към Index
             }
-            return View(training);
+            return View(training);  // Ако има грешки, връщаме към формата
         }
-
     }
 }
