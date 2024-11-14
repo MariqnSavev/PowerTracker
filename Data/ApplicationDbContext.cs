@@ -13,6 +13,6 @@ namespace BoxingAppDiploma.Data
      
         public DbSet<BoxingAppDiploma.Models.Diet> Diet { get; set; }
         public DbSet<Training> Training { get; set; }
-        public DbSet<BoxingAppDiploma.Models.Goal>? Goal { get; set; }
+       
     }
 }

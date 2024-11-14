@@ -4,20 +4,9 @@
 
 <h2>BoxingApp!</h2>
 
-<p>This is the main page of your application.</p>
 
-@if (User.Identity.IsAuthenticated)
-{
-    <p>Hello, @User.Identity.Name! You are logged in.</p>
-}
-else
-{
-    <p>You are not logged in. Please <a asp-controller="Account" asp-action="Login">log in</a>.</p>
-}
-
-<a asp-controller="User" asp-action="Profile">Go to your profile</a>
 
 <p>Track your daily training and diet here!</p>
 
 @Html.ActionLink("Add New Training", "Create", "Trainings", null, new { @class = "btn btn-primary" })
-@Html.ActionLink("Add Meats", "Create", "Diets", null, new { @class = "btn btn-primary" })
+@Html.ActionLink("Add Food", "Create", "Diets", null, new { @class = "btn btn-primary" })
