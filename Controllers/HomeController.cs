@@ -1,21 +1,28 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using BoxingAppDiploma.Data;
+using BoxingAppDiploma.Models;
+using System.Linq;
 
 namespace BoxingAppDiploma.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly ApplicationDbContext _context;
+
+        public HomeController(ApplicationDbContext context)
         {
-            return View(); // Зарежда Index.cshtml
-        }
-        public IActionResult Tranings()
-        {
-            return View(); 
+            _context = context;
         }
 
-        public IActionResult Error()
+        public IActionResult Index()
         {
-            return View();
+            var model = new HomePageViewModel
+            {
+                Trainings = _context.Training.OrderByDescending(t => t.Date).Take(5).ToList(), // Последни 5 тренировки
+                Diets = _context.Diet.OrderByDescending(d => d.Date).Take(5).ToList() // Последни 5 диети
+            };
+
+            return View(model);
         }
     }
 }
