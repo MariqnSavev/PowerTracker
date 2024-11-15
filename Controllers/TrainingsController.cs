@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization; // Необходимо за [Authorize]
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BoxingAppDiploma.Data;
 using BoxingAppDiploma.Models;
 
 namespace BoxingAppDiploma.Controllers
 {
+    [Authorize] // Гарантира, че всички действия в този контролер са достъпни само за логнати потребители
     public class TrainingsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,9 +22,9 @@ namespace BoxingAppDiploma.Controllers
         // GET: Trainings
         public async Task<IActionResult> Index()
         {
-              return _context.Training != null ? 
-                          View(await _context.Training.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Training'  is null.");
+            return _context.Training != null ?
+                       View(await _context.Training.ToListAsync()) :
+                       Problem("Entity set 'ApplicationDbContext.Training' is null.");
         }
 
         // GET: Trainings/Details/5
@@ -52,8 +52,6 @@ namespace BoxingAppDiploma.Controllers
         }
 
         // POST: Trainings/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Date,Description,DurationMinutes,CaloriesBurned")] Training training)
@@ -84,8 +82,6 @@ namespace BoxingAppDiploma.Controllers
         }
 
         // POST: Trainings/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Description,DurationMinutes,CaloriesBurned")] Training training)
@@ -143,21 +139,21 @@ namespace BoxingAppDiploma.Controllers
         {
             if (_context.Training == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Training'  is null.");
+                return Problem("Entity set 'ApplicationDbContext.Training' is null.");
             }
             var training = await _context.Training.FindAsync(id);
             if (training != null)
             {
                 _context.Training.Remove(training);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool TrainingExists(int id)
         {
-          return (_context.Training?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Training?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization; // Добавяме using за атрибута [Authorize]
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BoxingAppDiploma.Data;
 using BoxingAppDiploma.Models;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace BoxingAppDiploma.Controllers
 {
+    [Authorize] // Добавено тук, за да защити всички действия в контролера
     public class DietsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -120,6 +122,7 @@ namespace BoxingAppDiploma.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
         // GET: Diets/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -138,10 +141,10 @@ namespace BoxingAppDiploma.Controllers
 
             return View(diet); // Връщаме изгледа с намерената диета
         }
+
         private bool DietExists(int id)
         {
             return _context.Diet.Any(e => e.Id == id);
         }
-
     }
 }
