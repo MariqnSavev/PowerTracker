@@ -1,0 +1,19 @@
+﻿@model CalorieCalculator
+
+<form asp-action="Calculate" method="post">
+    <label for="Activity">Activity:</label>
+    <select asp-for="Activity">
+        <option>Running</option>
+        <option>Cycling</option>
+        <option>Walking</option>
+        <option>Weightlifting</option>
+    </select>
+    <br />
+    <label for="DurationInMinutes">Duration (in minutes):</label>
+    <input type="number" asp-for="DurationInMinutes" />
+    <br />
+    <label for="WeightInKg">Your Weight (in kg):</label>
+    <input type="number" asp-for="WeightInKg" />
+    <br />
+    <button type="submit">Calculate</button>
+</form>
