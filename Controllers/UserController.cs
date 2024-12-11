@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using BoxingAppDiploma.Models;
-using BoxingAppDiploma.ViewModels; // Път до модела ApplicationUser
+using PowerTracker.Models;
+using PowerTracker.ViewModels; // Път до модела ApplicationUser
 
 
-namespace BoxingAppDiploma.Controllers
+namespace PowerTracker.Controllers
 {
     [Authorize] // Ограничаваме достъпа до всички действия за логнати потребители
     public class UserController : Controller

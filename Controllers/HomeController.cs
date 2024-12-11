@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BoxingAppDiploma.Data;
-using BoxingAppDiploma.Models;
+using PowerTracker.Data;
+using PowerTracker.Models;
 using System.Linq;
 
-namespace BoxingAppDiploma.Controllers
+namespace PowerTracker.Controllers
 {
     public class HomeController : Controller
     {

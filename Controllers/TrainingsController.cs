@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization; // Необходимо за [Authorize]
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BoxingAppDiploma.Data;
-using BoxingAppDiploma.Models;
+using PowerTracker.Data;
+using PowerTracker.Models;
 
-namespace BoxingAppDiploma.Controllers
+namespace PowerTracker.Controllers
 {
     [Authorize] // Гарантира, че всички действия в този контролер са достъпни само за логнати потребители
     public class TrainingsController : Controller

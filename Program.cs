@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using BoxingAppDiploma.Data;
-using BoxingAppDiploma.Models;
+using PowerTracker.Data;
+using PowerTracker.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

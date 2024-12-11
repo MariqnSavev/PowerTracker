@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BoxingAppDiploma.Controllers
+namespace PowerTracker.Controllers
 {
     [Authorize]
     public class SettingsController : Controller

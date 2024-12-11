@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace BoxingAppDiploma.Models
+namespace PowerTracker.Models
 {
     public class Training
     {

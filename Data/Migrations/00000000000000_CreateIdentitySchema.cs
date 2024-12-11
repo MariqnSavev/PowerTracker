@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 
-namespace BoxingAppDiploma.Data.Migrations
+namespace PowerTracker.Data.Migrations
 {
     public partial class CreateIdentitySchema : Migration
     {

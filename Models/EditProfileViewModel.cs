@@ -1,4 +1,4 @@
-﻿namespace BoxingAppDiploma.ViewModels
+﻿namespace PowerTracker.ViewModels
 {
     public class EditProfileViewModel
     {

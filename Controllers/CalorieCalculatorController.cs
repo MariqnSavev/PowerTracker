@@ -1,7 +1,7 @@
-﻿using BoxingAppDiploma.Models;
+﻿using PowerTracker.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BoxingAppDiploma.Controllers
+namespace PowerTracker.Controllers
 {
     public class CalorieCalculatorController : Controller
     {

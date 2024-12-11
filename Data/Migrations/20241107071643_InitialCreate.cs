@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BoxingAppDiploma.Data.Migrations
+namespace PowerTracker.Data.Migrations
 {
     public partial class InitialCreate : Migration
     {

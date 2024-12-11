@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Identity;
 
-namespace BoxingAppDiploma.Models
+namespace PowerTracker.Models
 {
     public class ApplicationUser : IdentityUser
     {

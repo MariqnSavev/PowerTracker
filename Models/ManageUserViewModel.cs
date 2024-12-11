@@ -1,4 +1,4 @@
-﻿namespace BoxingAppDiploma.Models
+﻿namespace PowerTracker.Models
 {
     public class ManageUserViewModel
     {

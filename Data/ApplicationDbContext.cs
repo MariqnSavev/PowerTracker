@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using BoxingAppDiploma.Models;
+using PowerTracker.Models;
 
-namespace BoxingAppDiploma.Data
+namespace PowerTracker.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {
@@ -11,7 +11,7 @@ namespace BoxingAppDiploma.Data
         {
         }
      
-        public DbSet<BoxingAppDiploma.Models.Diet> Diet { get; set; }
+        public DbSet<PowerTracker.Models.Diet> Diet { get; set; }
         public DbSet<Training> Training { get; set; }
        
     }

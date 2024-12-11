@@ -1,10 +1,10 @@
 ﻿
-using BoxingAppDiploma.Models;
+using PowerTracker.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BoxingAppDiploma.Controllers
+namespace PowerTracker.Controllers
 {
     public class FoodCalculatorController : Controller
     {

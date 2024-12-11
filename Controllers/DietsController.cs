@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization; // Добавяме using за атрибута [Authorize]
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BoxingAppDiploma.Data;
-using BoxingAppDiploma.Models;
+using PowerTracker.Data;
+using PowerTracker.Models;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BoxingAppDiploma.Controllers
+namespace PowerTracker.Controllers
 {
     [Authorize] // Добавено тук, за да защити всички действия в контролера
     public class DietsController : Controller

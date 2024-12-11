@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace BoxingAppDiploma.Data.Migrations
+namespace PowerTracker.Data.Migrations
 {
     public partial class DatabaseUp : Migration
     {
