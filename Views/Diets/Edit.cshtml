@@ -1,36 +1,60 @@
 ﻿@model PowerTracker.Models.Diet
 
-@{
-    ViewData["Title"] = "Edit";
-}
+<h1>Edit Diet Record</h1>
 
-<h1>Edit</h1>
+<form action="/Diets/Edit" method="post">
+    <!-- Hidden field for ID -->
+    <input type="hidden" name="Id" value="@Model.Id" />
 
-<h4>Diet</h4>
-<hr />
-<form asp-action="Edit">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="Id" />
+    <!-- Dropdown for Food Selection -->
     <div class="form-group">
-        <label asp-for="Date" class="control-label"></label>
-        <input asp-for="Date" class="form-control" type="date" />
-        <span asp-validation-for="Date" class="text-danger"></span>
+        <label for="FoodName">Select Food</label>
+        <select id="FoodName" name="FoodName" class="form-control">
+            <option value="">-- Select Food --</option>
+            <option value="Apple" data-calories="52">Apple</option>
+            <option value="Banana" data-calories="96">Banana</option>
+            <option value="Chicken Breast" data-calories="165">Chicken Breast</option>
+            <option value="Rice" data-calories="130">Rice</option>
+            <option value="Broccoli" data-calories="35">Broccoli</option>
+        </select>
     </div>
+
+    <!-- Input for Quantity -->
     <div class="form-group">
-        <label asp-for="MealDescription" class="control-label"></label>
-        <input asp-for="MealDescription" class="form-control" />
-        <span asp-validation-for="MealDescription" class="text-danger"></span>
+        <label for="QuantityInGrams">Quantity (in grams)</label>
+        <input type="number" id="QuantityInGrams" name="QuantityInGrams" class="form-control" value="@Model.QuantityInGrams" />
     </div>
+
+    <!-- Display Calculated Calories -->
     <div class="form-group">
-        <label asp-for="Calories" class="control-label"></label>
-        <input asp-for="Calories" class="form-control" />
-        <span asp-validation-for="Calories" class="text-danger"></span>
+        <label for="Calories">Total Calories</label>
+        <input type="number" id="Calories" name="Calories" class="form-control" value="@Model.Calories" readonly />
     </div>
-    <div class="form-group">
-        <input type="submit" value="Save" class="btn btn-primary" />
-    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a href="/Diets/Index" class="btn btn-secondary">Cancel</a>
 </form>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<script>
+    // Preselect the current food in the dropdown
+    document.getElementById("FoodName").value = "@Model.FoodName";
+
+    // Function to calculate calories
+    function calculateCalories() {
+        const foodSelect = document.getElementById("FoodName");
+        const selectedOption = foodSelect.options[foodSelect.selectedIndex];
+        const caloriesPer100g = parseFloat(selectedOption.getAttribute("data-calories")) || 0;
+        const quantity = parseFloat(document.getElementById("QuantityInGrams").value) || 0;
+
+        const totalCalories = (caloriesPer100g * quantity) / 100;
+        document.getElementById("Calories").value = totalCalories.toFixed(2);
+    }
+
+    // Add event listeners to update calories dynamically
+    document.getElementById("FoodName").addEventListener("change", calculateCalories);
+    document.getElementById("QuantityInGrams").addEventListener("input", calculateCalories);
+
+    // Calculate calories on page load
+    calculateCalories();
+</script>

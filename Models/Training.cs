@@ -15,12 +15,17 @@ namespace PowerTracker.Models
         [StringLength(500, ErrorMessage = "Описанието не може да бъде по-дълго от 500 символа.")]
         public string Description { get; set; }
 
+        [Required(ErrorMessage = "Моля, изберете вид на тренировката.")]
+        public string Activity { get; set; } // Вид на тренировката (за падащото меню)
+
         [Required(ErrorMessage = "Моля, въведете продължителността на тренировката.")]
         [Range(1, 300, ErrorMessage = "Продължителността трябва да бъде между 1 и 300 минути.")]
         public int DurationMinutes { get; set; }
 
-        [Required(ErrorMessage = "Моля, въведете изгорените калории.")]
-        [Range(0, 1000, ErrorMessage = "Изгорените калории трябва да бъдат между 0 и 1000.")]
-        public int CaloriesBurned { get; set; }
+        [Required(ErrorMessage = "Моля, въведете вашето тегло.")]
+        [Range(30, 300, ErrorMessage = "Теглото трябва да бъде между 30 и 300 кг.")]
+        public double WeightInKg { get; set; } // Тегло на потребителя
+
+        public double CaloriesBurned { get; set; } // Изчислени изгорени калории
     }
 }

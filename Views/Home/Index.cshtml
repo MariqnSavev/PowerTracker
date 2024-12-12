@@ -9,7 +9,6 @@
     <p class="text-center">Проследявайте своите тренировки и диети тук!</p>
 
     @if (User.Identity.IsAuthenticated)
-
     {
         <div class="text-center mb-4">
             @Html.ActionLink("Добави нова тренировка", "Create", "Trainings", null, new { @class = "btn btn-primary mx-2" })
@@ -21,19 +20,20 @@
             <div class="col-md-6">
                 <h3 class="text-center">Последни тренировки</h3>
                 @if (Model?.Trainings != null && Model.Trainings.Any())
-
                 {
                     <div class="card mb-4">
                         <div class="card-body">
                             <ul class="list-group list-group-flush">
                                 @foreach (var training in Model.Trainings)
-
                                 {
                                     <li class="list-group-item">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
                                                 <strong>@training.Date.ToShortDateString()</strong> - @training.Description
-                                                <p class="mb-0"><i class="fas fa-clock"></i> @training.DurationMinutes min | <i class="fas fa-burn"></i> @training.CaloriesBurned kcal</p>
+                                                <p class="mb-0">
+                                                    <i class="fas fa-clock"></i> @training.DurationMinutes min |
+                                                    <i class="fas fa-burn"></i> @training.CaloriesBurned kcal
+                                                </p>
                                             </div>
                                             <span class="badge badge-primary badge-pill">@training.CaloriesBurned kcal</span>
                                         </div>
@@ -43,9 +43,7 @@
                         </div>
                     </div>
                 }
-
                 else
-
                 {
                     <p class="text-center text-muted">Няма записани тренировки.</p>
                 }
@@ -55,19 +53,20 @@
             <div class="col-md-6">
                 <h3 class="text-center">Последни диетични записи</h3>
                 @if (Model?.Diets != null && Model.Diets.Any())
-
                 {
                     <div class="card mb-4">
                         <div class="card-body">
                             <ul class="list-group list-group-flush">
                                 @foreach (var diet in Model.Diets)
-
                                 {
                                     <li class="list-group-item">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <strong>@diet.Date.ToShortDateString()</strong> - @diet.MealDescription
-                                                <p class="mb-0"><i class="fas fa-utensils"></i> @diet.Calories kcal</p>
+                                                <strong>@diet.Date.ToShortDateString()</strong> - @diet.FoodName
+                                                <p class="mb-0">
+                                                    <i class="fas fa-utensils"></i> Quantity: @diet.QuantityInGrams g |
+                                                    Calories: @diet.Calories kcal
+                                                </p>
                                             </div>
                                             <span class="badge badge-success badge-pill">@diet.Calories kcal</span>
                                         </div>
@@ -77,9 +76,7 @@
                         </div>
                     </div>
                 }
-
                 else
-
                 {
                     <p class="text-center text-muted">Няма записани храни.</p>
                 }
@@ -92,9 +89,7 @@
             <a asp-controller="FoodCalculator" asp-action="Index" class="btn btn-warning mx-2">Food Calorie Calculator</a>
         </div>
     }
-
     else
-
     {
         <div class="alert alert-info text-center">
             Моля, влезте в профила си, за да видите последните тренировки и диетични записи.

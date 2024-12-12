@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization; // Необходимо за [Authorize]
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PowerTracker.Data;
@@ -9,7 +9,7 @@ using PowerTracker.Models;
 
 namespace PowerTracker.Controllers
 {
-    [Authorize] // Гарантира, че всички действия в този контролер са достъпни само за логнати потребители
+    [Authorize]
     public class TrainingsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -17,6 +17,27 @@ namespace PowerTracker.Controllers
         public TrainingsController(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        // Метод за изчисление на калориите
+        private double CalculateCaloriesBurned(string activity, int durationMinutes, double weight)
+        {
+            // MET стойности за различни тренировки
+            var metValues = new Dictionary<string, double>
+            {
+                { "Running", 9.8 },
+                { "Cycling", 7.5 },
+                { "Walking", 3.8 },
+                { "Weightlifting", 6.0 }
+            };
+
+            if (metValues.ContainsKey(activity))
+            {
+                double met = metValues[activity];
+                return (met * weight * durationMinutes) / 60.0; // Формула за изчисление на калории
+            }
+
+            return 0.0; // Ако видът на тренировката не е намерен
         }
 
         // GET: Trainings
@@ -35,8 +56,7 @@ namespace PowerTracker.Controllers
                 return NotFound();
             }
 
-            var training = await _context.Training
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var training = await _context.Training.FirstOrDefaultAsync(m => m.Id == id);
             if (training == null)
             {
                 return NotFound();
@@ -54,10 +74,14 @@ namespace PowerTracker.Controllers
         // POST: Trainings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Date,Description,DurationMinutes,CaloriesBurned")] Training training)
+        public async Task<IActionResult> Create([Bind("Id,Date,Description,Activity,DurationMinutes,WeightInKg")] Training training)
         {
             if (ModelState.IsValid)
             {
+                // Изчисляване на калориите
+                training.CaloriesBurned = CalculateCaloriesBurned(training.Activity, training.DurationMinutes, training.WeightInKg);
+
+                // Записване в базата данни
                 _context.Add(training);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -84,7 +108,7 @@ namespace PowerTracker.Controllers
         // POST: Trainings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Description,DurationMinutes,CaloriesBurned")] Training training)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Description,Activity,DurationMinutes,WeightInKg")] Training training)
         {
             if (id != training.Id)
             {
@@ -95,6 +119,10 @@ namespace PowerTracker.Controllers
             {
                 try
                 {
+                    // Изчисляване на калориите
+                    training.CaloriesBurned = CalculateCaloriesBurned(training.Activity, training.DurationMinutes, training.WeightInKg);
+
+                    // Обновяване на записа
                     _context.Update(training);
                     await _context.SaveChangesAsync();
                 }
@@ -122,8 +150,7 @@ namespace PowerTracker.Controllers
                 return NotFound();
             }
 
-            var training = await _context.Training
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var training = await _context.Training.FirstOrDefaultAsync(m => m.Id == id);
             if (training == null)
             {
                 return NotFound();

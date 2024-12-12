@@ -1,34 +1,32 @@
 ﻿@model IEnumerable<PowerTracker.Models.Diet>
 
-@{
-    ViewData["Title"] = "Index";
-}
-
-<h1>Index</h1>
+<h1>Diet Records</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Add New Record</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.Date)</th>
-            <th>@Html.DisplayNameFor(model => model.MealDescription)</th>
-            <th>@Html.DisplayNameFor(model => model.Calories)</th>
-            <th></th>
+            <th>Food</th>
+            <th>Quantity (g)</th>
+            <th>Calories</th>
+            <th>Date</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var diet in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(modelItem => item.Date)</td>
-                <td>@Html.DisplayFor(modelItem => item.MealDescription)</td>
-                <td>@Html.DisplayFor(modelItem => item.Calories)</td>
+                <td>@diet.FoodName</td>
+                <td>@diet.QuantityInGrams</td>
+                <td>@diet.Calories</td>
+                <td>@diet.Date.ToString("dd/MM/yyyy")</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id" onclick="return confirm('Are you sure you want to delete this diet?');">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@diet.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@diet.Id" class="btn btn-danger btn-sm">Delete</a>
                 </td>
             </tr>
         }
