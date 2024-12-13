@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using PowerTracker.Models;
 using System;
 using System.Collections.Generic;
@@ -31,18 +32,18 @@ namespace PowerTracker.Controllers
             ("Bread", 265)
         };
 
-        private static readonly List<Diet> DietRecords = new(); // Списък с записи за диетите
+        private static readonly List<Diet> DietRecords = new();
 
         // GET: Diets
         public IActionResult Index()
         {
-            return View(DietRecords); // Показва всички записи
+            return View(DietRecords);
         }
 
         // GET: Diets/Details/5
         public IActionResult Details(int? id)
         {
-            if (id == null || id < 0 || id >= DietRecords.Count)
+            if (id == null || id <= 0)
             {
                 return NotFound();
             }
@@ -53,13 +54,13 @@ namespace PowerTracker.Controllers
                 return NotFound();
             }
 
-            return View(diet); // Показва детайли за записа
+            return View(diet);
         }
 
         // GET: Diets/Create
         public IActionResult Create()
         {
-            ViewBag.FoodList = FoodList;
+            ViewBag.FoodList = new SelectList(FoodList, "Name", "Name");
             return View();
         }
 
@@ -76,7 +77,7 @@ namespace PowerTracker.Controllers
                     diet.Calories = (diet.QuantityInGrams / 100) * food.CaloriesPer100g;
                     diet.Date = DateTime.Now;
 
-                    diet.Id = DietRecords.Count > 0 ? DietRecords.Max(d => d.Id) + 1 : 1; // Генерира ID
+                    diet.Id = DietRecords.Count > 0 ? DietRecords.Max(d => d.Id) + 1 : 1;
                     DietRecords.Add(diet);
 
                     return RedirectToAction(nameof(Index));
@@ -85,14 +86,14 @@ namespace PowerTracker.Controllers
                 ModelState.AddModelError("", "Selected food not found.");
             }
 
-            ViewBag.FoodList = FoodList;
+            ViewBag.FoodList = new SelectList(FoodList, "Name", "Name");
             return View(diet);
         }
 
         // GET: Diets/Edit/5
         public IActionResult Edit(int? id)
         {
-            if (id == null || id < 0 || id >= DietRecords.Count)
+            if (id == null || id <= 0)
             {
                 return NotFound();
             }
@@ -103,7 +104,7 @@ namespace PowerTracker.Controllers
                 return NotFound();
             }
 
-            ViewBag.FoodList = FoodList;
+            ViewBag.FoodList = new SelectList(FoodList, "Name", "Name", diet.FoodName);
             return View(diet);
         }
 
@@ -134,14 +135,14 @@ namespace PowerTracker.Controllers
                 ModelState.AddModelError("", "Selected food not found.");
             }
 
-            ViewBag.FoodList = FoodList;
+            ViewBag.FoodList = new SelectList(FoodList, "Name", "Name", updatedDiet.FoodName);
             return View(updatedDiet);
         }
 
         // GET: Diets/Delete/5
         public IActionResult Delete(int? id)
         {
-            if (id == null || id < 0 || id >= DietRecords.Count)
+            if (id == null || id <= 0)
             {
                 return NotFound();
             }

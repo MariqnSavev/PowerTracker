@@ -6,15 +6,12 @@
     <!-- Dropdown for Food Selection -->
     <div class="form-group">
         <label for="FoodName">Select Food</label>
-        <select id="FoodName" name="FoodName" class="form-control">
-            <option value="">-- Select Food --</option>
-            @foreach (var food in (List<(string, double)>)ViewBag.FoodList)
-            {
-                <option value="@food.Item1" data-calories="@food.Item2">
-                    @food.Item1
-                </option>
-            }
-        </select>
+        @Html.DropDownListFor(
+                 model => model.FoodName,
+                 (SelectList)ViewBag.FoodList,
+                 "-- Select Food --",
+                 new { @class = "form-control" }
+                 )
         <span asp-validation-for="FoodName" class="text-danger"></span>
     </div>
 
