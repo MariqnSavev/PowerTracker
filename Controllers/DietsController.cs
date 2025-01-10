@@ -43,25 +43,29 @@ namespace PowerTracker.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Намиране на избраната храна
-                var food = FoodList.FirstOrDefault(f => f.Id == diet.Id);
+                // Намираме храната по име (не по ID)
+                var food = FoodList.FirstOrDefault(f => f.Name.Equals(diet.Name, StringComparison.OrdinalIgnoreCase));
                 if (food != null)
                 {
+                    // Задаваме името на храната и калориите на 100 грама
                     diet.Name = food.Name;
                     diet.CaloriesPer100g = food.CaloriesPer100g;
+                    // Изчисляваме калориите на базата на въведеното количество
                     diet.Calories = (diet.QuantityInGrams / 100) * food.CaloriesPer100g;
                     diet.Date = DateTime.Now;
 
+                    // Определяме уникален ID за новия запис
                     diet.Id = DietRecords.Count > 0 ? DietRecords.Max(d => d.Id) + 1 : 1;
-                    DietRecords.Add(diet);
+                    DietRecords.Add(diet); // Добавяме новия запис в списъка с диетични записи
 
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index)); // Пренасочваме към индекс страницата
                 }
 
-                ModelState.AddModelError("", "Избраната храна не е намерена.");
+                // Ако няма намерена храна, добавяме грешка в модела
+                ModelState.AddModelError("", "Храната с това име не беше намерена.");
             }
 
-            ViewBag.FoodList = new SelectList(FoodList, "Id", "Name");
+            // Ако е имало грешки, връщаме изгледа със същите данни
             return View(diet);
         }
 
