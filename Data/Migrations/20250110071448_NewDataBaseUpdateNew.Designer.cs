@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PowerTracker.Data;
 
@@ -11,9 +12,10 @@ using PowerTracker.Data;
 namespace PowerTracker.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250110071448_NewDataBaseUpdateNew")]
+    partial class NewDataBaseUpdateNew
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -235,13 +237,10 @@ namespace PowerTracker.Data.Migrations
                     b.Property<double>("Calories")
                         .HasColumnType("float");
 
-                    b.Property<double>("CaloriesPer100g")
-                        .HasColumnType("float");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("FoodName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

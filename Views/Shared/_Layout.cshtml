@@ -1,74 +1,59 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-@{
-    var currentUser = SignInManager.IsSignedIn(User) ? User.Identity?.Name : null;
-}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] - PowerTracker</title>
 
-    <!-- Стилове за Bootstrap -->
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/PowerTracker.styles.css" asp-append-version="true" />
-    <!-- Иконки от Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Включване на основни стилове -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <!-- Логото и линк към началната страница -->
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PowerTracker</a>
+        <!-- Навигационно меню -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-lightning-charge-fill"></i> PowerTracker
+                </a>
 
-                <!-- Бутон за мобилно меню -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <!-- Навигационното меню -->
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
-                        <!-- Линк към началната страница -->
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-
-                        <!-- Линк към страница за управление на акаунта -->
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Trainings" ? "active" : "")" asp-controller="Trainings" asp-action="Index">Trainings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Diets" ? "active" : "")" asp-controller="Diets" asp-action="Index">Diets</a>
+                        </li>
                         @if (SignInManager.IsSignedIn(User))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                                    Hello @currentUser!
-                                </a>
-                            </li>
-
-                            <!-- Линк за изход -->
-                            <li class="nav-item">
-                                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                                    <button type="submit" class="nav-link btn btn-link text-dark">
-                                        <i class="bi bi-box-arrow-right"></i> Logout
+                                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                                    <button class="nav-link btn btn-link text-light">
+                                        <i class="bi bi-box-arrow-right"></i> Logout (@User.Identity.Name)
                                     </button>
                                 </form>
                             </li>
                         }
                         else
                         {
-                            <!-- Линкове за вход и регистрация -->
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">
-                                    <i class="bi bi-person-plus"></i> Register
-                                </a>
+                                <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">
-                                    <i class="bi bi-box-arrow-in-right"></i> Login
-                                </a>
+                                <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
                             </li>
                         }
                     </ul>
@@ -77,25 +62,20 @@
         </nav>
     </header>
 
-    <!-- Основно съдържание на страницата -->
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()  <!-- Тук ще бъде показано съдържанието на всяка страница -->
-        </main>
-    </div>
+    <!-- Основно съдържание -->
+    <main class="container py-4">
+        @RenderBody() <!-- Връзка за рендиране на всяка страница -->
+    </main>
 
-    <!-- Footer -->
-    <footer class="border-top footer text-muted py-4">
-        <div class="container text-center">
-            &copy; 2024 - PowerTracker - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Футър -->
+    <footer class="bg-dark text-light py-4">
+        <div class="text-center">
+            &copy; @DateTime.Now.Year PowerTracker | <a href="@Url.Action("Privacy", "Home")" class="text-warning">Privacy</a>
         </div>
     </footer>
 
-    <!-- Скриптове за Bootstrap и JQuery -->
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!-- Включване на JavaScript -->
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-
-    @await RenderSectionAsync("Scripts", required: false)  <!-- Тук се добавят специфични скриптове за всяка страница -->
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

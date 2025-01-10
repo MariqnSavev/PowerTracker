@@ -1,31 +1,19 @@
 ﻿@model PowerTracker.Models.Diet
 
-<h1>Edit Diet Record</h1>
+<h2>Редакция на запис</h2>
 
 <form asp-action="Edit" method="post">
-    <!-- Hidden field for ID -->
-    <input type="hidden" asp-for="Id" />
-
-    <!-- Dropdown for Food Selection -->
     <div class="form-group">
-        <label asp-for="FoodName">Select Food</label>
-        <select asp-for="FoodName" asp-items="ViewBag.FoodList" class="form-control"></select>
-        <span asp-validation-for="FoodName" class="text-danger"></span>
+        <label for="Name">Изберете храна</label>
+        <select asp-for="Id" class="form-control" asp-items="ViewBag.FoodList"></select>
+        <span asp-validation-for="Id" class="text-danger"></span>
     </div>
 
-    <!-- Input for Quantity -->
     <div class="form-group">
-        <label asp-for="QuantityInGrams">Quantity (in grams)</label>
+        <label asp-for="QuantityInGrams" class="control-label">Количество (г)</label>
         <input asp-for="QuantityInGrams" class="form-control" />
         <span asp-validation-for="QuantityInGrams" class="text-danger"></span>
     </div>
 
-    <!-- Display Calculated Calories -->
-    <div class="form-group">
-        <label asp-for="Calories">Total Calories</label>
-        <input asp-for="Calories" class="form-control" readonly />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save Changes</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Запази</button>
 </form>

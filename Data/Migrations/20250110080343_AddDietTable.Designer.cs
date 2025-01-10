@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PowerTracker.Data;
 
@@ -11,9 +12,10 @@ using PowerTracker.Data;
 namespace PowerTracker.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250110080343_AddDietTable")]
+    partial class AddDietTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -235,13 +237,13 @@ namespace PowerTracker.Data.Migrations
                     b.Property<double>("Calories")
                         .HasColumnType("float");
 
-                    b.Property<double>("CaloriesPer100g")
-                        .HasColumnType("float");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
+                    b.Property<int>("FoodId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FoodName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -251,6 +253,27 @@ namespace PowerTracker.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Diet");
+                });
+
+            modelBuilder.Entity("PowerTracker.Models.Food", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<double>("CaloriesPer100g")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Food");
                 });
 
             modelBuilder.Entity("PowerTracker.Models.Training", b =>

@@ -1,34 +1,35 @@
 ﻿@model IEnumerable<PowerTracker.Models.Diet>
 
-<h1>Diet Records</h1>
-
-<p>
-    <a asp-action="Create" class="btn btn-primary">Add New Record</a>
-</p>
+<h2>Списък с храни</h2>
 
 <table class="table">
     <thead>
         <tr>
-            <th>Food</th>
-            <th>Quantity (g)</th>
-            <th>Calories</th>
-            <th>Date</th>
-            <th>Actions</th>
+            <th>Име</th>
+            <th>Количество (г)</th>
+            <th>Калории на 100г</th>
+            <th>Общо калории</th>
+            <th>Дата</th>
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var diet in Model)
+        @foreach (var item in Model)
         {
             <tr>
-                <td>@diet.FoodName</td>
-                <td>@diet.QuantityInGrams</td>
-                <td>@diet.Calories</td>
-                <td>@diet.Date.ToString("dd/MM/yyyy")</td>
+                <td>@item.Name</td> <!-- Тук коригирах FoodName на Name -->
+                <td>@item.QuantityInGrams</td>
+                <td>@item.CaloriesPer100g</td>
+                <td>@item.Calories</td>
+                <td>@item.Date.ToShortDateString()</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@diet.Id" class="btn btn-warning btn-sm">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@diet.Id" class="btn btn-danger btn-sm">Delete</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Детайли</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Редакция</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Изтриване</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<a asp-action="Create" class="btn btn-primary">Добави нов запис</a>

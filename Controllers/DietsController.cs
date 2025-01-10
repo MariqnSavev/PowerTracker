@@ -1,37 +1,26 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using PowerTracker.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PowerTracker.Models;
 
 namespace PowerTracker.Controllers
 {
-    [Authorize]
     public class DietsController : Controller
     {
-        // Статичен списък с храни
-        private static readonly List<(string Name, double CaloriesPer100g)> FoodList = new()
+        // Списък с наличните храни
+        private static readonly List<Diet> FoodList = new()
         {
-            ("Apple", 52),
-            ("Banana", 96),
-            ("Chicken Breast", 165),
-            ("Rice", 130),
-            ("Broccoli", 35),
-            ("Cheese", 402),
-            ("Eggs", 155),
-            ("Fish", 206),
-            ("Pasta", 131),
-            ("Potato", 77),
-            ("Tomato", 18),
-            ("Milk", 42),
-            ("Beef", 250),
-            ("Chocolate", 546),
-            ("Yogurt", 59),
-            ("Bread", 265)
+            new Diet { Id = 1, Name = "Apple", CaloriesPer100g = 52 },
+            new Diet { Id = 2, Name = "Banana", CaloriesPer100g = 96 },
+            new Diet { Id = 3, Name = "Orange", CaloriesPer100g = 43 },
+            new Diet { Id = 4, Name = "Grapes", CaloriesPer100g = 69 },
+            new Diet { Id = 5, Name = "Chicken Breast", CaloriesPer100g = 165 }
+            // Добавете още храни тук
         };
 
+        // Списък с диетични записи
         private static readonly List<Diet> DietRecords = new();
 
         // GET: Diets
@@ -40,27 +29,10 @@ namespace PowerTracker.Controllers
             return View(DietRecords);
         }
 
-        // GET: Diets/Details/5
-        public IActionResult Details(int? id)
-        {
-            if (id == null || id <= 0)
-            {
-                return NotFound();
-            }
-
-            var diet = DietRecords.FirstOrDefault(d => d.Id == id);
-            if (diet == null)
-            {
-                return NotFound();
-            }
-
-            return View(diet);
-        }
-
         // GET: Diets/Create
         public IActionResult Create()
         {
-            ViewBag.FoodList = new SelectList(FoodList, "Name", "Name");
+            ViewBag.FoodList = new SelectList(FoodList, "Id", "Name");
             return View();
         }
 
@@ -71,9 +43,12 @@ namespace PowerTracker.Controllers
         {
             if (ModelState.IsValid)
             {
-                var food = FoodList.FirstOrDefault(f => f.Name == diet.FoodName);
-                if (food != default)
+                // Намиране на избраната храна
+                var food = FoodList.FirstOrDefault(f => f.Id == diet.Id);
+                if (food != null)
                 {
+                    diet.Name = food.Name;
+                    diet.CaloriesPer100g = food.CaloriesPer100g;
                     diet.Calories = (diet.QuantityInGrams / 100) * food.CaloriesPer100g;
                     diet.Date = DateTime.Now;
 
@@ -83,75 +58,69 @@ namespace PowerTracker.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                ModelState.AddModelError("", "Selected food not found.");
+                ModelState.AddModelError("", "Избраната храна не е намерена.");
             }
 
-            ViewBag.FoodList = new SelectList(FoodList, "Name", "Name");
+            ViewBag.FoodList = new SelectList(FoodList, "Id", "Name");
             return View(diet);
         }
 
         // GET: Diets/Edit/5
         public IActionResult Edit(int? id)
         {
-            if (id == null || id <= 0)
-            {
+            if (id == null)
                 return NotFound();
-            }
 
             var diet = DietRecords.FirstOrDefault(d => d.Id == id);
             if (diet == null)
-            {
                 return NotFound();
-            }
 
-            ViewBag.FoodList = new SelectList(FoodList, "Name", "Name", diet.FoodName);
+            ViewBag.FoodList = new SelectList(FoodList, "Id", "Name", diet.Id);
             return View(diet);
         }
 
         // POST: Diets/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Diet updatedDiet)
+        public IActionResult Edit(int id, Diet diet)
         {
+            if (id != diet.Id)
+                return NotFound();
+
             if (ModelState.IsValid)
             {
-                var diet = DietRecords.FirstOrDefault(d => d.Id == id);
-                if (diet == null)
+                var existingDiet = DietRecords.FirstOrDefault(d => d.Id == id);
+                if (existingDiet != null)
                 {
-                    return NotFound();
+                    var food = FoodList.FirstOrDefault(f => f.Id == diet.Id);
+                    if (food != null)
+                    {
+                        existingDiet.Name = food.Name;
+                        existingDiet.CaloriesPer100g = food.CaloriesPer100g;
+                        existingDiet.QuantityInGrams = diet.QuantityInGrams;
+                        existingDiet.Calories = (diet.QuantityInGrams / 100) * food.CaloriesPer100g;
+                        existingDiet.Date = DateTime.Now;
+
+                        return RedirectToAction(nameof(Index));
+                    }
+
+                    ModelState.AddModelError("", "Избраната храна не е намерена.");
                 }
-
-                var food = FoodList.FirstOrDefault(f => f.Name == updatedDiet.FoodName);
-                if (food != default)
-                {
-                    diet.FoodName = updatedDiet.FoodName;
-                    diet.QuantityInGrams = updatedDiet.QuantityInGrams;
-                    diet.Calories = (updatedDiet.QuantityInGrams / 100) * food.CaloriesPer100g;
-                    diet.Date = DateTime.Now;
-
-                    return RedirectToAction(nameof(Index));
-                }
-
-                ModelState.AddModelError("", "Selected food not found.");
             }
 
-            ViewBag.FoodList = new SelectList(FoodList, "Name", "Name", updatedDiet.FoodName);
-            return View(updatedDiet);
+            ViewBag.FoodList = new SelectList(FoodList, "Id", "Name", diet.Id);
+            return View(diet);
         }
 
         // GET: Diets/Delete/5
         public IActionResult Delete(int? id)
         {
-            if (id == null || id <= 0)
-            {
+            if (id == null)
                 return NotFound();
-            }
 
             var diet = DietRecords.FirstOrDefault(d => d.Id == id);
             if (diet == null)
-            {
                 return NotFound();
-            }
 
             return View(diet);
         }
