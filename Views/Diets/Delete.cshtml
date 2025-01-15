@@ -1,28 +1,33 @@
 ﻿@model PowerTracker.Models.Diet
 
-<h2>Изтриване на запис</h2>
+@{
+    ViewData["Title"] = "Delete Diet";
+}
+
+<h2>Delete Diet</h2>
 
 <div>
-    <h3>Сигурни ли сте, че искате да изтриете този запис?</h3>
-    <div>
-        <dl class="row">
-            <dt class="col-sm-2">Име</dt>
-            <dd class="col-sm-10">@Model.Name</dd> <!-- Тук коригирах FoodName на Name -->
+    <h4>Are you sure you want to delete this diet?</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Food</dt>
+        <dd>@Model.Food.Name</dd>
 
-            <dt class="col-sm-2">Количество (г)</dt>
-            <dd class="col-sm-10">@Model.QuantityInGrams</dd>
+        <dt>Category</dt>
+        <dd>@Model.Category.NameOfCategorie</dd>
 
-            <dt class="col-sm-2">Калории на 100г</dt>
-            <dd class="col-sm-10">@Model.CaloriesPer100g</dd>
+        <dt>Quantity (grams)</dt>
+        <dd>@Model.QuantityInGrams</dd>
 
-            <dt class="col-sm-2">Общо калории</dt>
-            <dd class="col-sm-10">@Model.Calories</dd>
-        </dl>
-    </div>
+        <dt>Calories</dt>
+        <dd>@Model.Calories</dd>
 
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <button type="submit" class="btn btn-danger">Изтрий</button>
-        <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+        <dt>Date</dt>
+        <dd>@Model.Date.ToString("yyyy-MM-dd")</dd>
+    </dl>
+
+    <form asp-action="DeleteConfirmed">
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="@Url.Action("Index", "Diets")" class="btn btn-secondary">Cancel</a>
     </form>
 </div>

@@ -1,24 +1,31 @@
 ﻿@model PowerTracker.Models.Diet
 
-<h2>Детайли за храната</h2>
+@{
+    ViewData["Title"] = "Diet Details";
+}
+
+<h2>Diet Details</h2>
 
 <div>
-    <dl class="row">
-        <dt class="col-sm-2">Име</dt>
-        <dd class="col-sm-10">@Model.Name</dd>
+    <h4>Diet</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Food</dt>
+        <dd>@Model.Food.Name</dd>
 
-        <dt class="col-sm-2">Калории на 100г</dt>
-        <dd class="col-sm-10">@Model.CaloriesPer100g</dd>
+        <dt>Category</dt>
+        <dd>@Model.Category.NameOfCategorie</dd>
 
-        <dt class="col-sm-2">Количество (г)</dt>
-        <dd class="col-sm-10">@Model.QuantityInGrams</dd>
+        <dt>Quantity (grams)</dt>
+        <dd>@Model.QuantityInGrams</dd>
 
-        <dt class="col-sm-2">Общо калории</dt>
-        <dd class="col-sm-10">@Model.Calories</dd>
+        <dt>Calories</dt>
+        <dd>@Model.Calories</dd>
 
-        <dt class="col-sm-2">Дата</dt>
-        <dd class="col-sm-10">@Model.Date.ToShortDateString()</dd>
+        <dt>Date</dt>
+        <dd>@Model.Date.ToString("yyyy-MM-dd")</dd>
     </dl>
 </div>
 
-<a asp-action="Index" class="btn btn-secondary">Обратно</a>
+<a href="@Url.Action("Edit", "Diets", new { id = Model.Id })" class="btn btn-warning">Edit</a>
+<a href="@Url.Action("Index", "Diets")" class="btn btn-secondary">Back to List</a>

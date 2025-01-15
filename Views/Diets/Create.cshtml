@@ -1,35 +1,28 @@
 ﻿@model PowerTracker.Models.Diet
+@{
+    ViewBag.Title = "Create Diet";
+}
 
-<h2>Добавяне на нова храна</h2>
+<h2>Create Diet</h2>
 
-<form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()
-
-    <div class="form-group">
-        <label asp-for="Name" class="control-label">Име на храна</label>
-        <!-- Текстово поле за въвеждане на името на храната -->
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="QuantityInGrams" class="control-label">Количество (г)</label>
-        <input asp-for="QuantityInGrams" class="form-control" />
-        <span asp-validation-for="QuantityInGrams" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Запази</button>
-</form>
-
-@if (!ViewData.ModelState.IsValid)
+@using (Html.BeginForm())
 {
-    <div class="alert alert-danger">
-        <strong>Грешки:</strong>
-        <ul>
-            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-            {
-                <li>@error.ErrorMessage</li>
-            }
-        </ul>
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.FoodId)
+        @Html.DropDownListFor(model => model.FoodId, new SelectList(ViewBag.FoodList, "Id", "Name"), "Select Food")
+        @Html.ValidationMessageFor(model => model.FoodId)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.QuantityInGrams)
+        @Html.TextBoxFor(model => model.QuantityInGrams)
+        @Html.ValidationMessageFor(model => model.QuantityInGrams)
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
     </div>
 }

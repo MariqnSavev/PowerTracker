@@ -1,19 +1,38 @@
 ﻿@model PowerTracker.Models.Diet
 
-<h2>Редакция на запис</h2>
+@{
+    ViewData["Title"] = "Edit Diet";
+}
 
-<form asp-action="Edit" method="post">
+<h2>Edit Diet</h2>
+
+<form asp-action="Edit">
     <div class="form-group">
-        <label for="Name">Изберете храна</label>
-        <select asp-for="Id" class="form-control" asp-items="ViewBag.FoodList"></select>
-        <span asp-validation-for="Id" class="text-danger"></span>
+        <label asp-for="FoodId" class="control-label"></label>
+        <select asp-for="FoodId" class="form-control" asp-items="@(new SelectList(ViewBag.FoodList, "Id", "Name", Model.FoodId))"></select>
+        <span asp-validation-for="FoodId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="QuantityInGrams" class="control-label">Количество (г)</label>
+        <label asp-for="CategoryId" class="control-label"></label>
+        <select asp-for="CategoryId" class="form-control" asp-items="@(new SelectList(ViewBag.CategoryList, "Id", "NameOfCategorie", Model.CategoryId))"></select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="QuantityInGrams" class="control-label"></label>
         <input asp-for="QuantityInGrams" class="form-control" />
         <span asp-validation-for="QuantityInGrams" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Запази</button>
+    <div class="form-group">
+        <label asp-for="CaloriesPer100g" class="control-label"></label>
+        <input asp-for="CaloriesPer100g" class="form-control" readonly="readonly" />
+        <span asp-validation-for="CaloriesPer100g" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
 </form>
+
+<a href="@Url.Action("Index", "Diets")" class="btn btn-secondary">Back to List</a>
+

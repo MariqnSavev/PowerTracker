@@ -29,40 +29,48 @@ namespace PowerTracker.Controllers
             ViewBag.CategoryList = _context.FoodCategories.ToList(); // Предоставяме всички категории за избор
             return View();
         }
-
-        // POST: Diets/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Diet diet)
         {
             if (ModelState.IsValid)
             {
-                // Тук използваме новите имена на свойствата от модела
-                var food = _context.Foods.FirstOrDefault(f => f.Id == diet.FoodId); // FoodId вместо IDFood
-                var category = _context.FoodCategories.FirstOrDefault(c => c.Id == diet.CategoryId); // CategoryId вместо IDCategory
+                // Извличане на храна и категория от базата данни
+                var food = _context.Foods.FirstOrDefault(f => f.Id == diet.FoodId);
+                var category = _context.FoodCategories.FirstOrDefault(c => c.Id == diet.CategoryId);
+
+                // Ако храна и категория са намерени
                 if (food != null && category != null)
                 {
-                    // Задаваме стойностите за Food и CaloriesPer100g от Food модела
-                    diet.Food = food; // Food вместо NameOfFood
-                    diet.Category = category; // Category вместо NameOfCategory
-                    diet.CaloriesPer100g = food.CaloriesPer100g;
-                    diet.CalculateCalories(); // Изчисляваме калориите
+                    // Присвояваме стойности на моделите
+                    diet.Food = food;
+                    diet.Category = category;
+                    diet.Calories = (diet.QuantityInGrams / 100) * diet.CaloriesPer100g;
 
-                    diet.Date = DateTime.Now; // Задаваме текущата дата
+                    // Изчисляваме калориите
+                    diet.Calories = (diet.QuantityInGrams / 100) * diet.CaloriesPer100g;
 
-                    _context.Add(diet); // Добавяме новата диета в контекста
-                    _context.SaveChanges(); // Записваме промените в базата
+                    // Задаваме текущата дата
+                    diet.Date = DateTime.Now;
 
-                    return RedirectToAction(nameof(Index)); // Пренасочваме към Index
+                    // Добавяме в контекста и записваме в базата данни
+                    _context.Add(diet);
+                    _context.SaveChanges();
+
+                    // Пренасочваме към Index
+                    return RedirectToAction(nameof(Index));
                 }
+
+                // Ако храна или категория не са намерени
                 ModelState.AddModelError("", "Храната или категорията не са намерени.");
             }
 
-            // Връщаме данни към изгледа при грешка
             ViewBag.FoodList = _context.Foods.ToList();
             ViewBag.CategoryList = _context.FoodCategories.ToList();
             return View(diet);
+
         }
+
 
         // GET: Diets/Edit/5
         public IActionResult Edit(int? id)
@@ -100,7 +108,8 @@ namespace PowerTracker.Controllers
                         existingDiet.Food = food;
                         existingDiet.Category = category;
                         existingDiet.QuantityInGrams = diet.QuantityInGrams;
-                        existingDiet.CaloriesPer100g = food.CaloriesPer100g;
+                       existingDiet.Calories = (Convert.ToDouble(diet.QuantityInGrams) / 100) * Convert.ToDouble(food.CaloriesPer100g);
+
                         existingDiet.CalculateCalories(); // Изчисляваме калориите
                         existingDiet.Date = DateTime.Now;
 

@@ -1,35 +1,37 @@
 ﻿@model IEnumerable<PowerTracker.Models.Diet>
+@{
+    ViewData["Title"] = "Diet Index";
+}
 
-<h2>Списък с храни</h2>
+<h2>All Diets</h2>
 
 <table class="table">
     <thead>
         <tr>
-            <th>Име</th>
-            <th>Количество (г)</th>
-            <th>Калории на 100г</th>
-            <th>Общо калории</th>
-            <th>Дата</th>
-            <th>Действия</th>
+            <th>Food</th>
+            <th>Category</th>
+            <th>Quantity (grams)</th>
+            <th>Calories</th>
+            <th>Date</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var diet in Model)
         {
             <tr>
-                <td>@item.Name</td> <!-- Тук коригирах FoodName на Name -->
-                <td>@item.QuantityInGrams</td>
-                <td>@item.CaloriesPer100g</td>
-                <td>@item.Calories</td>
-                <td>@item.Date.ToShortDateString()</td>
+                <td>@diet.Food.Name</td> <!-- Използваме Food.Name -->
+                <td>@diet.Category.NameOfCategorie</td> <!-- Използваме Category.NameOfCategorie -->
+                <td>@diet.QuantityInGrams</td>
+                <td>@diet.Calories</td>
+                <td>@diet.Date.ToString("yyyy-MM-dd")</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Детайли</a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Редакция</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Изтриване</a>
+                    <a href="@Url.Action("Edit", "Diets", new { id = diet.Id })" class="btn btn-warning">Edit</a>
+                    <a href="@Url.Action("Delete", "Diets", new { id = diet.Id })" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
-<a asp-action="Create" class="btn btn-primary">Добави нов запис</a>
+<a href="@Url.Action("Create", "Diets")" class="btn btn-primary">Create New Diet</a>
