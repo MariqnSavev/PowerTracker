@@ -1,38 +1,32 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using PowerTracker.Data;
 using PowerTracker.Models;
+using System;
+using System.Linq;
 
 namespace PowerTracker.Controllers
 {
     public class DietsController : Controller
     {
-        // Списък с наличните храни
-        private static readonly List<Diet> FoodList = new()
-        {
-            new Diet { Id = 1, Name = "Apple", CaloriesPer100g = 52 },
-            new Diet { Id = 2, Name = "Banana", CaloriesPer100g = 96 },
-            new Diet { Id = 3, Name = "Orange", CaloriesPer100g = 43 },
-            new Diet { Id = 4, Name = "Grapes", CaloriesPer100g = 69 },
-            new Diet { Id = 5, Name = "Chicken Breast", CaloriesPer100g = 165 }
-            // Добавете още храни тук
-        };
+        private readonly ApplicationDbContext _context;
 
-        // Списък с диетични записи
-        private static readonly List<Diet> DietRecords = new();
+        public DietsController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         // GET: Diets
         public IActionResult Index()
         {
-            return View(DietRecords);
+            var diets = _context.Diet.ToList(); // Вземаме всички диети
+            return View(diets);
         }
 
         // GET: Diets/Create
         public IActionResult Create()
         {
-            ViewBag.FoodList = new SelectList(FoodList, "Id", "Name");
+            ViewBag.FoodList = _context.Foods.ToList(); // Предоставяме всички храни за избор
+            ViewBag.CategoryList = _context.FoodCategories.ToList(); // Предоставяме всички категории за избор
             return View();
         }
 
@@ -43,29 +37,30 @@ namespace PowerTracker.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Намираме храната по име (не по ID)
-                var food = FoodList.FirstOrDefault(f => f.Name.Equals(diet.Name, StringComparison.OrdinalIgnoreCase));
-                if (food != null)
+                // Тук използваме новите имена на свойствата от модела
+                var food = _context.Foods.FirstOrDefault(f => f.Id == diet.FoodId); // FoodId вместо IDFood
+                var category = _context.FoodCategories.FirstOrDefault(c => c.Id == diet.CategoryId); // CategoryId вместо IDCategory
+                if (food != null && category != null)
                 {
-                    // Задаваме името на храната и калориите на 100 грама
-                    diet.Name = food.Name;
+                    // Задаваме стойностите за Food и CaloriesPer100g от Food модела
+                    diet.Food = food; // Food вместо NameOfFood
+                    diet.Category = category; // Category вместо NameOfCategory
                     diet.CaloriesPer100g = food.CaloriesPer100g;
-                    // Изчисляваме калориите на базата на въведеното количество
-                    diet.Calories = (diet.QuantityInGrams / 100) * food.CaloriesPer100g;
-                    diet.Date = DateTime.Now;
+                    diet.CalculateCalories(); // Изчисляваме калориите
 
-                    // Определяме уникален ID за новия запис
-                    diet.Id = DietRecords.Count > 0 ? DietRecords.Max(d => d.Id) + 1 : 1;
-                    DietRecords.Add(diet); // Добавяме новия запис в списъка с диетични записи
+                    diet.Date = DateTime.Now; // Задаваме текущата дата
 
-                    return RedirectToAction(nameof(Index)); // Пренасочваме към индекс страницата
+                    _context.Add(diet); // Добавяме новата диета в контекста
+                    _context.SaveChanges(); // Записваме промените в базата
+
+                    return RedirectToAction(nameof(Index)); // Пренасочваме към Index
                 }
-
-                // Ако няма намерена храна, добавяме грешка в модела
-                ModelState.AddModelError("", "Храната с това име не беше намерена.");
+                ModelState.AddModelError("", "Храната или категорията не са намерени.");
             }
 
-            // Ако е имало грешки, връщаме изгледа със същите данни
+            // Връщаме данни към изгледа при грешка
+            ViewBag.FoodList = _context.Foods.ToList();
+            ViewBag.CategoryList = _context.FoodCategories.ToList();
             return View(diet);
         }
 
@@ -75,11 +70,12 @@ namespace PowerTracker.Controllers
             if (id == null)
                 return NotFound();
 
-            var diet = DietRecords.FirstOrDefault(d => d.Id == id);
+            var diet = _context.Diet.FirstOrDefault(d => d.Id == id);
             if (diet == null)
                 return NotFound();
 
-            ViewBag.FoodList = new SelectList(FoodList, "Id", "Name", diet.Id);
+            ViewBag.FoodList = _context.Foods.ToList();
+            ViewBag.CategoryList = _context.FoodCategories.ToList();
             return View(diet);
         }
 
@@ -93,26 +89,31 @@ namespace PowerTracker.Controllers
 
             if (ModelState.IsValid)
             {
-                var existingDiet = DietRecords.FirstOrDefault(d => d.Id == id);
+                var existingDiet = _context.Diet.FirstOrDefault(d => d.Id == id);
                 if (existingDiet != null)
                 {
-                    var food = FoodList.FirstOrDefault(f => f.Id == diet.Id);
-                    if (food != null)
+                    var food = _context.Foods.FirstOrDefault(f => f.Id == diet.FoodId);
+                    var category = _context.FoodCategories.FirstOrDefault(c => c.Id == diet.CategoryId);
+
+                    if (food != null && category != null)
                     {
-                        existingDiet.Name = food.Name;
-                        existingDiet.CaloriesPer100g = food.CaloriesPer100g;
+                        existingDiet.Food = food;
+                        existingDiet.Category = category;
                         existingDiet.QuantityInGrams = diet.QuantityInGrams;
-                        existingDiet.Calories = (diet.QuantityInGrams / 100) * food.CaloriesPer100g;
+                        existingDiet.CaloriesPer100g = food.CaloriesPer100g;
+                        existingDiet.CalculateCalories(); // Изчисляваме калориите
                         existingDiet.Date = DateTime.Now;
 
+                        _context.SaveChanges();
                         return RedirectToAction(nameof(Index));
                     }
 
-                    ModelState.AddModelError("", "Избраната храна не е намерена.");
+                    ModelState.AddModelError("", "Храната или категорията не са намерени.");
                 }
             }
 
-            ViewBag.FoodList = new SelectList(FoodList, "Id", "Name", diet.Id);
+            ViewBag.FoodList = _context.Foods.ToList();
+            ViewBag.CategoryList = _context.FoodCategories.ToList();
             return View(diet);
         }
 
@@ -122,7 +123,7 @@ namespace PowerTracker.Controllers
             if (id == null)
                 return NotFound();
 
-            var diet = DietRecords.FirstOrDefault(d => d.Id == id);
+            var diet = _context.Diet.FirstOrDefault(d => d.Id == id);
             if (diet == null)
                 return NotFound();
 
@@ -134,13 +135,14 @@ namespace PowerTracker.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var diet = DietRecords.FirstOrDefault(d => d.Id == id);
+            var diet = _context.Diet.FirstOrDefault(d => d.Id == id);
             if (diet != null)
             {
-                DietRecords.Remove(diet);
+                _context.Diet.Remove(diet); // Премахваме диетата от базата
+                _context.SaveChanges(); // Записваме промените в базата
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index)); // Пренасочваме към Index
         }
     }
 }

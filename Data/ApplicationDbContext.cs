@@ -18,7 +18,7 @@ namespace PowerTracker.Data
      
         public DbSet<PowerTracker.Models.Diet> Diet { get; set; }
         public DbSet<Training> Training { get; set; }
-        public DbSet<PowerTracker.Models.Foods>? Foods { get; set; }
+        public DbSet<Foods> Foods { get; set; }
         public DbSet<PowerTracker.Models.FoodCategories>? FoodCategories { get; set; }
 
        
