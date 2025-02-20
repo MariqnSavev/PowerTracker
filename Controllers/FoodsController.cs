@@ -22,75 +22,54 @@ namespace PowerTracker.Controllers
         // GET: Foods
         public async Task<IActionResult> Index()
         {
-              return _context.Foods != null ? 
-                          View(await _context.Foods.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Foods'  is null.");
-        }
-
-        // GET: Foods/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Foods == null)
-            {
-                return NotFound();
-            }
-
-            var foods = await _context.Foods
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (foods == null)
-            {
-                return NotFound();
-            }
-
-            return View(foods);
+            var foods = _context.Foods.Include(f => f.NameOfCategorie);
+            return View(await foods.ToListAsync());
         }
 
         // GET: Foods/Create
         public IActionResult Create()
         {
+            ViewBag.FoodCategories = _context.FoodCategories.ToList();
             return View();
         }
 
         // POST: Foods/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,CaloriesPer100g,IdCategorie")] Foods foods)
+        public async Task<IActionResult> Create([Bind("Id,Name,CaloriesPer100g,FoodCategorieID")] Foods food)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(foods);
+                _context.Add(food);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(foods);
+            return View(food);
         }
 
         // GET: Foods/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Foods == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var foods = await _context.Foods.FindAsync(id);
-            if (foods == null)
+            var food = await _context.Foods.FindAsync(id);
+            if (food == null)
             {
                 return NotFound();
             }
-            return View(foods);
+            ViewBag.FoodCategories = _context.FoodCategories.ToList();
+            return View(food);
         }
 
         // POST: Foods/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CaloriesPer100g,IdCategorie")] Foods foods)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CaloriesPer100g,FoodCategorieID")] Foods food)
         {
-            if (id != foods.Id)
+            if (id != food.Id)
             {
                 return NotFound();
             }
@@ -99,12 +78,12 @@ namespace PowerTracker.Controllers
             {
                 try
                 {
-                    _context.Update(foods);
+                    _context.Update(food);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!FoodsExists(foods.Id))
+                    if (!FoodsExists(food.Id))
                     {
                         return NotFound();
                     }
@@ -115,25 +94,26 @@ namespace PowerTracker.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(foods);
+            return View(food);
         }
 
         // GET: Foods/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Foods == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var foods = await _context.Foods
+            var food = await _context.Foods
+                .Include(f => f.NameOfCategorie)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (foods == null)
+            if (food == null)
             {
                 return NotFound();
             }
 
-            return View(foods);
+            return View(food);
         }
 
         // POST: Foods/Delete/5
@@ -141,23 +121,15 @@ namespace PowerTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Foods == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.Foods'  is null.");
-            }
-            var foods = await _context.Foods.FindAsync(id);
-            if (foods != null)
-            {
-                _context.Foods.Remove(foods);
-            }
-            
+            var food = await _context.Foods.FindAsync(id);
+            _context.Foods.Remove(food);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool FoodsExists(int id)
         {
-          return (_context.Foods?.Any(e => e.Id == id)).GetValueOrDefault();
+            return _context.Foods.Any(e => e.Id == id);
         }
     }
 }

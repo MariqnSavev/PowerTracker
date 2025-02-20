@@ -19,7 +19,7 @@
                 @Html.DisplayNameFor(model => model.CaloriesPer100g)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IdCategorie)
+                @Html.DisplayNameFor(model => model.FoodCategorieID)
             </th>
             <th></th>
         </tr>
@@ -34,7 +34,7 @@
                 @Html.DisplayFor(modelItem => item.CaloriesPer100g)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdCategorie)
+                    @Html.DisplayFor(modelItem => item.FoodCategorieID)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

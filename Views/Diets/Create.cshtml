@@ -1,28 +1,40 @@
 ﻿@model PowerTracker.Models.Diet
+
 @{
-    ViewBag.Title = "Create Diet";
+    ViewData["Title"] = "Create Diet";
 }
 
 <h2>Create Diet</h2>
 
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
-    @Html.ValidationSummary(true)
-
+<form asp-action="Create">
     <div class="form-group">
-        @Html.LabelFor(model => model.FoodId)
-        @Html.DropDownListFor(model => model.FoodId, new SelectList(ViewBag.FoodList, "Id", "Name"), "Select Food")
-        @Html.ValidationMessageFor(model => model.FoodId)
+        <label for="FoodId">Food</label>
+        <select asp-for="FoodId" class="form-control" asp-items="@(new SelectList(ViewBag.Foods, "Id", "Name"))">
+            <option value="">Select Food</option>
+        </select>
+        <span asp-validation-for="FoodId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        @Html.LabelFor(model => model.QuantityInGrams)
-        @Html.TextBoxFor(model => model.QuantityInGrams)
-        @Html.ValidationMessageFor(model => model.QuantityInGrams)
+        <label for="CategoryId">Category</label>
+        <select asp-for="CategoryId" class="form-control" asp-items="@(new SelectList(ViewBag.FoodCategories, "Id", "NameOfCategorie"))">
+            <option value="">Select Category</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-primary" />
+        <label for="CaloriesPer100g">Calories per 100g</label>
+        <input asp-for="CaloriesPer100g" class="form-control" />
+        <span asp-validation-for="CaloriesPer100g" class="text-danger"></span>
     </div>
-}
+
+    <div class="form-group">
+        <label for="QuantityInGrams">Quantity (grams)</label>
+        <input asp-for="QuantityInGrams" class="form-control" />
+        <span asp-validation-for="QuantityInGrams" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

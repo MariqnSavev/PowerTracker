@@ -2,10 +2,10 @@
 {
     public class Foods
     {
-        public int Id { get; set; }
-        public double Name { get; set; }
-        public string CaloriesPer100g { get; set; }
-        public virtual FoodCategories NameOfcategorie { get; set; }
-        public int IdCategorie { get; set; }
+        public int Id { get; set; } // Unique identifier for the food
+        public string Name { get; set; } // Name of the food
+        public double CaloriesPer100g { get; set; } // Calories per 100 grams
+        public virtual FoodCategories NameOfCategorie { get; set; } // Link to food category
+        public int FoodCategorieID { get; set; } // Category ID (foreign key)
     }
 }

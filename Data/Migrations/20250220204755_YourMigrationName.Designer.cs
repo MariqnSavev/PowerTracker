@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PowerTracker.Data;
 
@@ -11,9 +12,10 @@ using PowerTracker.Data;
 namespace PowerTracker.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250220204755_YourMigrationName")]
+    partial class YourMigrationName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -284,22 +286,22 @@ namespace PowerTracker.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<double>("CaloriesPer100g")
-                        .HasColumnType("float");
-
-                    b.Property<int>("FoodCategorieID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("CaloriesPer100g")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("NameOfCategorieId")
+                    b.Property<int>("IdCategorie")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Name")
+                        .HasColumnType("float");
+
+                    b.Property<int>("NameOfcategorieId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NameOfCategorieId");
+                    b.HasIndex("NameOfcategorieId");
 
                     b.ToTable("Foods");
                 });
@@ -410,13 +412,13 @@ namespace PowerTracker.Data.Migrations
 
             modelBuilder.Entity("PowerTracker.Models.Foods", b =>
                 {
-                    b.HasOne("PowerTracker.Models.FoodCategories", "NameOfCategorie")
+                    b.HasOne("PowerTracker.Models.FoodCategories", "NameOfcategorie")
                         .WithMany()
-                        .HasForeignKey("NameOfCategorieId")
+                        .HasForeignKey("NameOfcategorieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("NameOfCategorie");
+                    b.Navigation("NameOfcategorie");
                 });
 #pragma warning restore 612, 618
         }

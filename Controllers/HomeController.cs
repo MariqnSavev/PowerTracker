@@ -16,13 +16,13 @@ namespace PowerTracker.Controllers
 
         public IActionResult Index()
         {
-            var model = new HomePageViewModel
-            {
-                Trainings = _context.Training.OrderByDescending(t => t.Date).Take(5).ToList(), // Последни 5 тренировки
-                Diets = _context.Diet.OrderByDescending(d => d.Date).Take(5).ToList() // Последни 5 диети
-            };
+            //var model = new HomePageViewModel
+           //{
+              //  Trainings = _context.Training.OrderByDescending(t => t.Date).Take(5).ToList(), // Последни 5 тренировки
+               // Diets = _context.Diet.OrderByDescending(d => d.Date).Take(5).ToList() // Последни 5 диети
+            //};
 
-            return View(model);
+            return View();
         }
     }
 }
