@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using PowerTracker.Data;
 using PowerTracker.Models;
-using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PowerTracker.Controllers
 {
@@ -16,37 +16,58 @@ namespace PowerTracker.Controllers
             _context = context;
         }
 
-        // GET: Diet
+        // GET: Diets
         public async Task<IActionResult> Index()
         {
-            var diets = _context.Diet.Include(d => d.Food).Include(d => d.Category);
-            return View(await diets.ToListAsync());
+            var diets = await _context.Diet
+                .Include(d => d.Food)
+                .ToListAsync();
+            return View(diets);
         }
 
-        // GET: Diet/Create
+        // GET: Diets/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var diet = await _context.Diet
+                .Include(d => d.Food)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (diet == null)
+            {
+                return NotFound();
+            }
+
+            return View(diet);
+        }
+
+        // GET: Diets/Create
         public IActionResult Create()
         {
-            ViewBag.Foods = _context.Foods.ToList();
-            ViewBag.FoodCategories = _context.FoodCategories.ToList();
+            ViewBag.FoodList = _context.Foods.ToList();  // Извличаме всички храни за падащото меню
             return View();
         }
 
-        // POST: Diet/Create
+        // POST: Diets/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FoodId,CategoryId,CaloriesPer100g,QuantityInGrams,Calories,Date")] Diet diet)
+        public async Task<IActionResult> Create([Bind("Id,FoodId,CaloriesPer100g,QuantityInGrams,Calories,Date")] Diet diet)
         {
             if (ModelState.IsValid)
             {
-                diet.CalculateCalories(); // Изчисляване на калориите
+                diet.CalculateCalories(); // Изчисляване на калориите въз основа на количеството
                 _context.Add(diet);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.FoodList = _context.Foods.ToList();  // Извличаме храни, ако има грешки
             return View(diet);
         }
 
-        // GET: Diet/Edit/5
+        // GET: Diets/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -59,15 +80,14 @@ namespace PowerTracker.Controllers
             {
                 return NotFound();
             }
-            ViewBag.Foods = _context.Foods.ToList();
-            ViewBag.FoodCategories = _context.FoodCategories.ToList();
+            ViewBag.FoodList = _context.Foods.ToList();  // Извличаме храни за падащото меню
             return View(diet);
         }
 
-        // POST: Diet/Edit/5
+        // POST: Diets/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FoodId,CategoryId,CaloriesPer100g,QuantityInGrams,Calories,Date")] Diet diet)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FoodId,CaloriesPer100g,QuantityInGrams,Calories,Date")] Diet diet)
         {
             if (id != diet.Id)
             {
@@ -78,7 +98,7 @@ namespace PowerTracker.Controllers
             {
                 try
                 {
-                    diet.CalculateCalories(); // Изчисляване на калориите
+                    diet.CalculateCalories(); // Преизчисляваме калориите
                     _context.Update(diet);
                     await _context.SaveChangesAsync();
                 }
@@ -95,10 +115,11 @@ namespace PowerTracker.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.FoodList = _context.Foods.ToList();  // Падащи менюта ако има грешки
             return View(diet);
         }
 
-        // GET: Diet/Delete/5
+        // GET: Diets/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -108,7 +129,6 @@ namespace PowerTracker.Controllers
 
             var diet = await _context.Diet
                 .Include(d => d.Food)
-                .Include(d => d.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (diet == null)
             {
@@ -118,7 +138,7 @@ namespace PowerTracker.Controllers
             return View(diet);
         }
 
-        // POST: Diet/Delete/5
+        // POST: Diets/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

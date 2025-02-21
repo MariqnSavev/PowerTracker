@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PowerTracker.Data;
 
@@ -11,9 +12,10 @@ using PowerTracker.Data;
 namespace PowerTracker.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250221124203_DietMigrationUpdate")]
+    partial class DietMigrationUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -238,6 +240,9 @@ namespace PowerTracker.Data.Migrations
                     b.Property<double>("CaloriesPer100g")
                         .HasColumnType("float");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
@@ -248,6 +253,8 @@ namespace PowerTracker.Data.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("FoodId");
 
@@ -386,11 +393,19 @@ namespace PowerTracker.Data.Migrations
 
             modelBuilder.Entity("PowerTracker.Models.Diet", b =>
                 {
+                    b.HasOne("PowerTracker.Models.FoodCategories", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PowerTracker.Models.Foods", "Food")
                         .WithMany()
                         .HasForeignKey("FoodId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("Food");
                 });
