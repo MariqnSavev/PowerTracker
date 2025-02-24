@@ -8,33 +8,51 @@
 
 <form asp-action="Create">
     <div class="form-group">
+        <label for="CategoryId">Category</label>
+        <select id="CategoryId" name="CategoryId" class="form-control">
+            <option value="">Select Category</option>
+            @foreach (var category in ViewBag.Categories)
+            {
+                <option value="@category.Id">@category.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
         <label for="FoodId">Food</label>
-        <select asp-for="FoodId" class="form-control" asp-items="@(new SelectList(ViewBag.Foods, "Id", "Name"))">
+        <select id="FoodId" name="FoodId" class="form-control">
             <option value="">Select Food</option>
         </select>
-        <span asp-validation-for="FoodId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label for="CategoryId">Category</label>
-        <select asp-for="CategoryId" class="form-control" asp-items="@(new SelectList(ViewBag.FoodCategories, "Id", "NameOfCategorie"))">
-            <option value="">Select Category</option>
-        </select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label for="CaloriesPer100g">Calories per 100g</label>
-        <input asp-for="CaloriesPer100g" class="form-control" />
-        <span asp-validation-for="CaloriesPer100g" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label for="QuantityInGrams">Quantity (grams)</label>
+        <label asp-for="QuantityInGrams" class="control-label">Quantity (grams)</label>
         <input asp-for="QuantityInGrams" class="form-control" />
         <span asp-validation-for="QuantityInGrams" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Create</button>
+    <button type="submit" class="btn btn-primary">Save</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#CategoryId').change(function () {
+                var categoryId = $(this).val();
+                $('#FoodId').empty();
+                $('#FoodId').append('<option value="">Select Food</option>');
+
+                if (categoryId) {
+                    $.getJSON('/Diets/GetFoodsByCategory?categoryId=' + categoryId, function (data) {
+                        $.each(data, function (i, food) {
+                            $('#FoodId').append('<option value="' + food.id + '">' + food.name + '</option>');
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+}
+ 

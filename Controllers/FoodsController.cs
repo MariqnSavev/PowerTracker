@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PowerTracker.Data;
 using PowerTracker.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PowerTracker.Controllers
 {
@@ -19,24 +17,38 @@ namespace PowerTracker.Controllers
             _context = context;
         }
 
-        // GET: Foods
+        // 📌 GET: Foods
         public async Task<IActionResult> Index()
         {
-            var foods = _context.Foods.Include(f => f.NameOfCategorie);
+            var foods = _context.Foods.Include(f => f.Category);
             return View(await foods.ToListAsync());
         }
 
-        // GET: Foods/Create
+        // 📌 GET: Foods/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var food = await _context.Foods
+                .Include(f => f.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (food == null) return NotFound();
+
+            return View(food);
+        }
+
+        // 📌 GET: Foods/Create
         public IActionResult Create()
         {
-            ViewBag.FoodCategories = _context.FoodCategories.ToList();
+            ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name");
             return View();
         }
 
-        // POST: Foods/Create
+        // 📌 POST: Foods/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,CaloriesPer100g,FoodCategorieID")] Foods food)
+        public async Task<IActionResult> Create([Bind("Name,CaloriesPer100g,CategoryId")] Foods food)
         {
             if (ModelState.IsValid)
             {
@@ -44,35 +56,30 @@ namespace PowerTracker.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            // Ако има грешки, презареждаме списъка с категории
+            ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name", food.CategoryId);
             return View(food);
         }
 
-        // GET: Foods/Edit/5
+        // 📌 GET: Foods/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var food = await _context.Foods.FindAsync(id);
-            if (food == null)
-            {
-                return NotFound();
-            }
-            ViewBag.FoodCategories = _context.FoodCategories.ToList();
+            if (food == null) return NotFound();
+
+            ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name", food.CategoryId);
             return View(food);
         }
 
-        // POST: Foods/Edit/5
+        // 📌 POST: Foods/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CaloriesPer100g,FoodCategorieID")] Foods food)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CaloriesPer100g,CategoryId")] Foods food)
         {
-            if (id != food.Id)
-            {
-                return NotFound();
-            }
+            if (id != food.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
@@ -83,51 +90,45 @@ namespace PowerTracker.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!FoodsExists(food.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!FoodExists(food.Id)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name", food.CategoryId);
             return View(food);
         }
 
-        // GET: Foods/Delete/5
+        // 📌 GET: Foods/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var food = await _context.Foods
-                .Include(f => f.NameOfCategorie)
+                .Include(f => f.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (food == null)
-            {
-                return NotFound();
-            }
+
+            if (food == null) return NotFound();
 
             return View(food);
         }
 
-        // POST: Foods/Delete/5
+        // 📌 POST: Foods/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var food = await _context.Foods.FindAsync(id);
-            _context.Foods.Remove(food);
-            await _context.SaveChangesAsync();
+            if (food != null)
+            {
+                _context.Foods.Remove(food);
+                await _context.SaveChangesAsync();
+            }
             return RedirectToAction(nameof(Index));
         }
 
-        private bool FoodsExists(int id)
+        private bool FoodExists(int id)
         {
             return _context.Foods.Any(e => e.Id == id);
         }

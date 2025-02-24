@@ -1,24 +1,22 @@
 ﻿@model PowerTracker.Models.FoodCategories
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Category Details";
 }
 
-<h1>Details</h1>
+<h2>Category Details</h2>
 
 <div>
-    <h4>FoodCategories</h4>
+    <h4>Category Name: @Model.Name</h4>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NameOfCategorie)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NameOfCategorie)
-        </dd>
-    </dl>
+    <h5>Foods in this Category:</h5>
+    <ul>
+        @foreach (var food in Model.Foods)
+        {
+            <li>@food.Name (@food.CaloriesPer100g kcal per 100g)</li>
+        }
+    </ul>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>

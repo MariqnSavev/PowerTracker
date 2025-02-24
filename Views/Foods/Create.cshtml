@@ -1,43 +1,38 @@
 ﻿@model PowerTracker.Models.Foods
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Добави нова храна";
 }
 
-<h1>Create</h1>
+<h2>@ViewData["Title"]</h2>
 
-<h4>Foods</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CaloriesPer100g" class="control-label"></label>
-                <input asp-for="CaloriesPer100g" class="form-control" />
-                <span asp-validation-for="CaloriesPer100g" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FoodCategorieID" class="control-label"></label>
-                <input asp-for="FoodCategorieID" class="form-control" />
-                <span asp-validation-for="FoodCategorieID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="Name" class="control-label">Име на храната</label>
+        <input asp-for="Name" class="form-control" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="form-group">
+        <label asp-for="CaloriesPer100g" class="control-label">Калории на 100 г</label>
+        <input asp-for="CaloriesPer100g" type="number" class="form-control" required />
+        <span asp-validation-for="CaloriesPer100g" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CategoryId" class="control-label">Категория</label>
+        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
+            <option value="">-- Изберете категория --</option>
+        </select> 
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Запази</button>
+    <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

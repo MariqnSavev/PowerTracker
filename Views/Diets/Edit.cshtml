@@ -13,11 +13,7 @@
         <span asp-validation-for="FoodId" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="CategoryId" class="control-label">Category</label>
-        <select asp-for="CategoryId" class="form-control" asp-items="@(new SelectList(ViewBag.CategoryList, "Id", "NameOfCategorie"))"></select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
-    </div>
+ 
 
     <div class="form-group">
         <label asp-for="CaloriesPer100g" class="control-label">Calories Per 100g</label>
