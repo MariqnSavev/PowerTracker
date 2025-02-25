@@ -1,4 +1,4 @@
-﻿using PowerTracker.Models;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace PowerTracker.Models
@@ -10,6 +10,7 @@ namespace PowerTracker.Models
         [Required]
         public string Name { get; set; }
 
+        // Връзка към храните
         public virtual ICollection<Foods> Foods { get; set; } = new List<Foods>();
     }
 }

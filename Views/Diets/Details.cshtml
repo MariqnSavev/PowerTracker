@@ -1,29 +1,30 @@
 ﻿@model PowerTracker.Models.Diet
 
 @{
-    ViewData["Title"] = "Diet Details";
+    ViewData["Title"] = "Детайли за диета";
 }
 
-<h2>Diet Details</h2>
+<h2>@ViewData["Title"]</h2>
 
 <div>
-    <h4>Diet</h4>
+    <h4>Диета</h4>
     <hr />
     <dl class="dl-horizontal">
-        <dt>Food</dt>
+        <dt>Категория</dt>
+        <dd>@Model.Category.Name</dd>
+
+        <dt>Храна</dt>
         <dd>@Model.Food.Name</dd>
 
-        
-        <dt>Quantity (grams)</dt>
+        <dt>Количество (г)</dt>
         <dd>@Model.QuantityInGrams</dd>
 
-        <dt>Calories</dt>
+        <dt>Калории</dt>
         <dd>@Model.Calories</dd>
 
-        <dt>Date</dt>
+        <dt>Дата</dt>
         <dd>@Model.Date.ToString("yyyy-MM-dd")</dd>
     </dl>
 </div>
-
-<a href="@Url.Action("Edit", "Diets", new { id = Model.Id })" class="btn btn-warning">Edit</a>
-<a href="@Url.Action("Index", "Diets")" class="btn btn-secondary">Back to List</a>
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редактирай</a>
+<a asp-action="Index" class="btn btn-secondary">Обратно към списъка</a>

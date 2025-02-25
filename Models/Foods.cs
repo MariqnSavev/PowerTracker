@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PowerTracker.Models
 {
@@ -13,7 +13,8 @@ namespace PowerTracker.Models
         [Required]
         public double CaloriesPer100g { get; set; }
 
-        [ForeignKey("Category")]
+        // Връзка към категория
+        [ForeignKey("FoodCategories")]
         public int CategoryId { get; set; }
         public virtual FoodCategories Category { get; set; }
     }

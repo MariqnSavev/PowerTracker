@@ -12,8 +12,8 @@ using PowerTracker.Data;
 namespace PowerTracker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250224145402_UpdateFoods")]
-    partial class UpdateFoods
+    [Migration("20250225144007_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -237,8 +237,8 @@ namespace PowerTracker.Migrations
                     b.Property<double>("Calories")
                         .HasColumnType("float");
 
-                    b.Property<double>("CaloriesPer100g")
-                        .HasColumnType("float");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -250,6 +250,8 @@ namespace PowerTracker.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("FoodId");
 
@@ -385,11 +387,19 @@ namespace PowerTracker.Migrations
 
             modelBuilder.Entity("PowerTracker.Models.Diet", b =>
                 {
+                    b.HasOne("PowerTracker.Models.FoodCategories", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("PowerTracker.Models.Foods", "Food")
                         .WithMany()
                         .HasForeignKey("FoodId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("Food");
                 });

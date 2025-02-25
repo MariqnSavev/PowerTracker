@@ -212,8 +212,8 @@ namespace PowerTracker.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
                     FoodId = table.Column<int>(type: "int", nullable: false),
-                    CaloriesPer100g = table.Column<double>(type: "float", nullable: false),
                     QuantityInGrams = table.Column<double>(type: "float", nullable: false),
                     Calories = table.Column<double>(type: "float", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -222,11 +222,17 @@ namespace PowerTracker.Migrations
                 {
                     table.PrimaryKey("PK_Diet", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Diet_FoodCategories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "FoodCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Diet_Foods_FoodId",
                         column: x => x.FoodId,
                         principalTable: "Foods",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -267,6 +273,11 @@ namespace PowerTracker.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Diet_CategoryId",
+                table: "Diet",
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Diet_FoodId",

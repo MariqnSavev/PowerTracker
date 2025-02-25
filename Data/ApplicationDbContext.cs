@@ -21,8 +21,23 @@ namespace PowerTracker.Data
         public DbSet<Foods> Foods { get; set; }
         public DbSet<PowerTracker.Models.FoodCategories>? FoodCategories { get; set; }
 
-       
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Diet>()
+                .HasOne(d => d.Category)
+                .WithMany()
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict); // Вместо CASCADE
+
+            modelBuilder.Entity<Diet>()
+                .HasOne(d => d.Food)
+                .WithMany()
+                .HasForeignKey(d => d.FoodId)
+                .OnDelete(DeleteBehavior.Restrict); // Вместо CASCADE
+        }
 
     }
 }

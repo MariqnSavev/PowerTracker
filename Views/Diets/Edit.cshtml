@@ -1,38 +1,28 @@
 ﻿@model PowerTracker.Models.Diet
 
 @{
-    ViewData["Title"] = "Edit Diet";
+    ViewData["Title"] = "Редактиране на диета";
 }
 
 <h2>@ViewData["Title"]</h2>
 
 <form asp-action="Edit">
-    <div class="form-group">
-        <label asp-for="FoodId" class="control-label">Food</label>
-        <select asp-for="FoodId" class="form-control" asp-items="@(new SelectList(ViewBag.FoodList, "Id", "Name"))"></select>
-        <span asp-validation-for="FoodId" class="text-danger"></span>
-    </div>
-
- 
+    <input type="hidden" asp-for="Id" />
 
     <div class="form-group">
-        <label asp-for="CaloriesPer100g" class="control-label">Calories Per 100g</label>
-        <input asp-for="CaloriesPer100g" class="form-control" />
-        <span asp-validation-for="CaloriesPer100g" class="text-danger"></span>
+        <label asp-for="CategoryId" class="control-label">Категория</label>
+        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories"></select>
     </div>
 
     <div class="form-group">
-        <label asp-for="QuantityInGrams" class="control-label">Quantity (g)</label>
+        <label asp-for="FoodId" class="control-label">Храна</label>
+        <select asp-for="FoodId" class="form-control" asp-items="ViewBag.Foods"></select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="QuantityInGrams" class="control-label">Количество (грамове)</label>
         <input asp-for="QuantityInGrams" class="form-control" />
-        <span asp-validation-for="QuantityInGrams" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Запази</button>
 </form>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

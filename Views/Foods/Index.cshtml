@@ -1,22 +1,19 @@
 ﻿@model IEnumerable<PowerTracker.Models.Foods>
 
 @{
-    ViewData["Title"] = "Foods List";
+    ViewData["Title"] = "Списък с храни";
 }
 
-<h2>Foods List</h2>
-
-<p>
-    <a asp-action="Create" class="btn btn-success">Add New Food</a>
-</p>
+<h2>@ViewData["Title"]</h2>
+<a asp-action="Create" class="btn btn-primary">Добави нова храна</a>
 
 <table class="table">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Calories Per 100g</th>
-            <th>Category</th>
-            <th>Actions</th>
+            <th>Име</th>
+            <th>Калории (100г)</th>
+            <th>Категория</th>
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
@@ -25,11 +22,11 @@
             <tr>
                 <td>@item.Name</td>
                 <td>@item.CaloriesPer100g</td>
-                <td>@item.Category?.Name</td> <!-- Проверяваме дали има категория -->
+                <td>@item.Category?.Name</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Редактирай</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Детайли</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Изтрий</a>
                 </td>
             </tr>
         }

@@ -17,7 +17,7 @@ namespace PowerTracker.Controllers
             _context = context;
         }
 
-        // 📌 GET: Foods
+        // 📌 GET: Foods (Списък с храни)
         public async Task<IActionResult> Index()
         {
             var foods = _context.Foods.Include(f => f.Category);
@@ -38,18 +38,20 @@ namespace PowerTracker.Controllers
             return View(food);
         }
 
-        // 📌 GET: Foods/Create
+        // 📌 GET: Foods/Create (Форма за създаване на храна)
         public IActionResult Create()
         {
             ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name");
             return View();
         }
 
-        // 📌 POST: Foods/Create
+        // 📌 POST: Foods/Create (Създаване на храна)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,CaloriesPer100g,CategoryId")] Foods food)
         {
+            ModelState.Remove("Category"); // За да избегнем грешка при валидация
+
             if (ModelState.IsValid)
             {
                 _context.Add(food);
@@ -57,12 +59,11 @@ namespace PowerTracker.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Ако има грешки, презареждаме списъка с категории
             ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name", food.CategoryId);
             return View(food);
         }
 
-        // 📌 GET: Foods/Edit/5
+        // 📌 GET: Foods/Edit/5 (Редактиране на храна)
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -74,12 +75,14 @@ namespace PowerTracker.Controllers
             return View(food);
         }
 
-        // 📌 POST: Foods/Edit/5
+        // 📌 POST: Foods/Edit/5 (Запазване на редактирана храна)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CaloriesPer100g,CategoryId")] Foods food)
         {
             if (id != food.Id) return NotFound();
+
+            ModelState.Remove("Category");
 
             if (ModelState.IsValid)
             {
@@ -100,7 +103,7 @@ namespace PowerTracker.Controllers
             return View(food);
         }
 
-        // 📌 GET: Foods/Delete/5
+        // 📌 GET: Foods/Delete/5 (Изтриване на храна)
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -114,7 +117,7 @@ namespace PowerTracker.Controllers
             return View(food);
         }
 
-        // 📌 POST: Foods/Delete/5
+        // 📌 POST: Foods/Delete/5 (Потвърждение на изтриване)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
