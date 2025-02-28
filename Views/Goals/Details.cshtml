@@ -1,0 +1,29 @@
+﻿@model PowerTracker.Models.Goal
+
+@{
+    ViewData["Title"] = "Детайли за целта";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>Име</dt>
+        <dd>@Model.Name</dd>
+
+        <dt>Начално тегло (кг)</dt>
+        <dd>@Model.StartWeight</dd>
+
+        <dt>Целево тегло (кг)</dt>
+        <dd>@Model.TargetWeight</dd>
+
+        <dt>Начална дата</dt>
+        <dd>@Model.StartDate.ToShortDateString()</dd>
+
+        <dt>Крайна дата</dt>
+        <dd>@Model.EndDate.ToShortDateString()</dd>
+    </dl>
+</div>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
+<a asp-action="Index" class="btn btn-secondary">Назад</a>

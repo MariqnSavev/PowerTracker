@@ -1,0 +1,51 @@
+﻿@model PowerTracker.Models.Goal
+
+@{
+    ViewData["Title"] = "Редактирай цел";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Edit">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Name" class="control-label">Име на целта</label>
+        <input asp-for="Name" class="form-control" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="StartWeight" class="control-label">Начално тегло (кг)</label>
+        <input asp-for="StartWeight" type="number" class="form-control" required />
+        <span asp-validation-for="StartWeight" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TargetWeight" class="control-label">Целево тегло (кг)</label>
+        <input asp-for="TargetWeight" type="number" class="form-control" required />
+        <span asp-validation-for="TargetWeight" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="StartDate" class="control-label">Начална дата</label>
+        <input asp-for="StartDate" type="date" class="form-control" required />
+        <span asp-validation-for="StartDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="EndDate" class="control-label">Крайна дата</label>
+        <input asp-for="EndDate" type="date" class="form-control" required />
+        <span asp-validation-for="EndDate" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-warning">Запази промените</button>
+    <a asp-action="Index" class="btn btn-secondary">Назад</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+}

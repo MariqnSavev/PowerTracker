@@ -1,0 +1,67 @@
+﻿@model IEnumerable<PowerTracker.Models.Goal>
+
+@{
+    ViewData["Title"] = "Цели";
+}
+
+<h2 class="mb-4">@ViewData["Title"]</h2>
+
+<!-- 🔘 Бутон за създаване -->
+<a asp-action="Create" class="btn btn-success mb-3">➕ Създай нова цел</a>
+
+<table class="table table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>Име</th>
+            <th>Начални кг</th>
+            <th>Целеви кг</th>
+            <th>Начална дата</th>
+            <th>Крайна дата</th>
+            <th class="text-center">Опции</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var goal in Model)
+        {
+            <tr>
+                <td>@goal.Name</td>
+                <td>@goal.StartWeight</td>
+                <td>@goal.TargetWeight</td>
+                <td>@goal.StartDate.ToShortDateString()</td>
+                <td>@goal.EndDate.ToShortDateString()</td>
+                <td class="text-center">
+                    <a asp-action="Edit" asp-route-id="@goal.Id" class="btn btn-warning btn-sm">✏ Редактирай</a>
+                    <a asp-action="Details" asp-route-id="@goal.Id" class="btn btn-info btn-sm">👁 Преглед</a>
+                    <a asp-action="Delete" asp-route-id="@goal.Id" class="btn btn-danger btn-sm">🗑 Изтрий</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- 📊 Графика за тегло -->
+<canvas id="goalsChart"></canvas>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('goalsChart').getContext('2d');
+
+        var chartData = {
+            labels: @Html.Raw(Json.Serialize(Model.Select(g => g.Name))),
+            datasets: [{
+                label: 'Тегло в кг',
+                data: @Html.Raw(Json.Serialize(Model.Select(g => g.TargetWeight))),
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+    </script>
+}

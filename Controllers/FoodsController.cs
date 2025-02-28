@@ -17,53 +17,41 @@ namespace PowerTracker.Controllers
             _context = context;
         }
 
-        // 📌 GET: Foods (Списък с храни)
+        // 📌 GET: Foods
         public async Task<IActionResult> Index()
         {
             var foods = _context.Foods.Include(f => f.Category);
             return View(await foods.ToListAsync());
         }
 
-        // 📌 GET: Foods/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var food = await _context.Foods
-                .Include(f => f.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (food == null) return NotFound();
-
-            return View(food);
-        }
-
-        // 📌 GET: Foods/Create (Форма за създаване на храна)
+        // 📌 GET: Foods/Create
         public IActionResult Create()
         {
             ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name");
             return View();
         }
 
-        // 📌 POST: Foods/Create (Създаване на храна)
+        // 📌 POST: Foods/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,CaloriesPer100g,CategoryId")] Foods food)
         {
-            ModelState.Remove("Category"); // За да избегнем грешка при валидация
+            ModelState.Remove("Category");
 
             if (ModelState.IsValid)
             {
+                Console.WriteLine($"✅ Запазване на храна: {food.Name} | Категория: {food.CategoryId}");
                 _context.Add(food);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
+            Console.WriteLine("❌ Грешка при запазване на храна!");
             ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name", food.CategoryId);
             return View(food);
         }
 
-        // 📌 GET: Foods/Edit/5 (Редактиране на храна)
+        // 📌 GET: Foods/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -75,7 +63,7 @@ namespace PowerTracker.Controllers
             return View(food);
         }
 
-        // 📌 POST: Foods/Edit/5 (Запазване на редактирана храна)
+        // 📌 POST: Foods/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CaloriesPer100g,CategoryId")] Foods food)
@@ -93,7 +81,7 @@ namespace PowerTracker.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!FoodExists(food.Id)) return NotFound();
+                    if (!_context.Foods.Any(e => e.Id == food.Id)) return NotFound();
                     else throw;
                 }
                 return RedirectToAction(nameof(Index));
@@ -103,7 +91,7 @@ namespace PowerTracker.Controllers
             return View(food);
         }
 
-        // 📌 GET: Foods/Delete/5 (Изтриване на храна)
+        // 📌 GET: Foods/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -111,13 +99,12 @@ namespace PowerTracker.Controllers
             var food = await _context.Foods
                 .Include(f => f.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
             if (food == null) return NotFound();
 
             return View(food);
         }
 
-        // 📌 POST: Foods/Delete/5 (Потвърждение на изтриване)
+        // 📌 POST: Foods/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

@@ -1,46 +1,65 @@
 ﻿@model PowerTracker.Models.Diet
 
-<h2>Добавяне на диета</h2>
+@{
+    ViewData["Title"] = "Добавяне на диета";
+}
+
+<h2>@ViewData["Title"]</h2>
 
 <form asp-action="Create">
     <div class="form-group">
-        <label asp-for="CategoryId">Категория</label>
-        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories" id="categoryDropdown">
+        <label for="categoryDropdown" class="control-label">Категория</label>
+        <select id="categoryDropdown" name="CategoryId" class="form-control" asp-items="ViewBag.Categories">
             <option value="">-- Изберете категория --</option>
         </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="FoodId">Храна</label>
-        <select asp-for="FoodId" class="form-control" id="foodDropdown">
+        <label for="foodDropdown" class="control-label">Храна</label>
+        <select id="foodDropdown" name="FoodId" class="form-control">
             <option value="">-- Първо изберете категория --</option>
         </select>
+        <span asp-validation-for="FoodId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="QuantityInGrams">Количество (г)</label>
+        <label asp-for="QuantityInGrams" class="control-label">Количество (грамове)</label>
         <input asp-for="QuantityInGrams" type="number" class="form-control" required />
+        <span asp-validation-for="QuantityInGrams" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-success">Запази</button>
     <a asp-action="Index" class="btn btn-secondary">Отказ</a>
 </form>
 
-<script>
-    $(document).ready(function () {
-        $("#categoryDropdown").change(function () {
-            var categoryId = $(this).val();
-            if (categoryId) {
-                $.getJSON('/Diets/GetFoodsByCategory?categoryId=' + categoryId, function (data) {
-                    var items = '<option value="">-- Изберете храна --</option>';
-                    $.each(data, function (i, food) {
-                        items += '<option value="' + food.id + '">' + food.name + '</option>';
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#categoryDropdown").change(function () {
+                var categoryId = $(this).val();
+                var foodDropdown = $("#foodDropdown");
+
+                foodDropdown.empty();
+                foodDropdown.append('<option value="">-- Зареждане... --</option>');
+
+                if (categoryId) {
+                    $.getJSON('/Diets/GetFoodsByCategory', { categoryId: categoryId }, function (data) {
+                        foodDropdown.empty();
+                        foodDropdown.append('<option value="">-- Изберете храна --</option>');
+                        $.each(data, function (index, item) {
+                            foodDropdown.append($('<option>', {
+                                value: item.id,
+                                text: item.name
+                            }));
+                        });
                     });
-                    $("#foodDropdown").html(items);
-                });
-            } else {
-                $("#foodDropdown").html('<option value="">-- Първо изберете категория --</option>');
-            }
+                } else {
+                    foodDropdown.append('<option value="">-- Първо изберете категория --</option>');
+                }
+            });
         });
-    });
-</script>
+    </script>
+}

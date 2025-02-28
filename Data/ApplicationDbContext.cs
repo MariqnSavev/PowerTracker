@@ -39,5 +39,8 @@ namespace PowerTracker.Data
                 .OnDelete(DeleteBehavior.Restrict); // Вместо CASCADE
         }
 
+
+        public DbSet<PowerTracker.Models.Goal>? Goal { get; set; }
+
     }
 }

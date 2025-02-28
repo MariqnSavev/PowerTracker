@@ -1,0 +1,33 @@
+﻿@model PowerTracker.Models.Goal
+
+@{
+    ViewData["Title"] = "Изтрий целта";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<h4>Сигурни ли сте, че искате да изтриете тази цел?</h4>
+<hr />
+
+<dl class="dl-horizontal">
+    <dt>Име</dt>
+    <dd>@Model.Name</dd>
+
+    <dt>Начално тегло (кг)</dt>
+    <dd>@Model.StartWeight</dd>
+
+    <dt>Целево тегло (кг)</dt>
+    <dd>@Model.TargetWeight</dd>
+
+    <dt>Начална дата</dt>
+    <dd>@Model.StartDate.ToShortDateString()</dd>
+
+    <dt>Крайна дата</dt>
+    <dd>@Model.EndDate.ToShortDateString()</dd>
+</dl>
+
+<form asp-action="DeleteConfirmed">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Изтрий</button>
+    <a asp-action="Index" class="btn btn-secondary">Назад</a>
+</form>
