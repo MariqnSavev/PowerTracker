@@ -1,63 +1,79 @@
-using Microsoft.AspNetCore.Identity;
+п»їusing Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PowerTracker.Data;
 using PowerTracker.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Получаваме connection string от конфигурацията (например от appsettings.json)
+// рџ“Њ Р’СЂСЉР·РєР° СЃ Р±Р°Р·Р°С‚Р° РґР°РЅРЅРё
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                         ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-// Добавяме контекста на базата данни и настройка за EF Core с повторно изпълнение при грешки
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString, sqlOptions =>
-        sqlOptions.EnableRetryOnFailure(  // Включване на механизма за повторни опити
-            maxRetryCount: 5,             // Максимален брой опити
-            maxRetryDelay: TimeSpan.FromSeconds(10),  // Максимално време за изчакване между опитите
-            errorNumbersToAdd: null)      // Можеш да добавиш специфични грешки, ако е необходимо (за момента оставяме null)
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null)
     )
 );
 
-// Добавяме услугите за обработка на грешки в режима на разработка
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+// рџ“Њ РќР°СЃС‚СЂРѕР№РєР° РЅР° Identity СЃ СЂРѕР»Рё
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
-// Добавяме услуги за ASP.NET Core Identity
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
-
-// Добавяме контролери с изгледи и Razor компилация
+// рџ“Њ Р”РѕР±Р°РІСЏРЅРµ РЅР° РєРѕРЅС‚СЂРѕР»РµСЂРё СЃ РёР·РіР»РµРґРё Рё Razor РєРѕРјРїРёР»Р°С†РёСЏ
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
 var app = builder.Build();
 
-// Конфигуриране на HTTP заявките
-if (app.Environment.IsDevelopment())
+// рџ“Њ РЎСЉР·РґР°РІР°РЅРµ РЅР° СЂРѕР»Рё РїСЂРё СЃС‚Р°СЂС‚РёСЂР°РЅРµ РЅР° РїСЂРёР»РѕР¶РµРЅРёРµС‚Рѕ
+using (var scope = app.Services.CreateScope())
 {
-    app.UseMigrationsEndPoint();  // Миграции в режим на разработка
+    var services = scope.ServiceProvider;
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+    await SeedRolesAndAdmin(roleManager, userManager);
 }
-else
-{
-    app.UseExceptionHandler("/Home/Error");  // Обработване на грешки в производствена среда
-    app.UseHsts();  // Добавяме HTTP Strict Transport Security
-}
 
-app.UseHttpsRedirection();  // Пренасочване към HTTPS
-app.UseStaticFiles();  // Статични файлове (CSS, JS, изображения)
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
 
-app.UseRouting();  // Маршрутиране на HTTP заявки
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.UseAuthentication();  // Удостоверяване (Authentication)
-app.UseAuthorization();  // Авторизация (Authorization)
-
-// Добавяме маршрута за контролера по подразбиране
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}"
 );
-
-// Добавяме Razor Pages (ако използваш Razor Pages, а не само MVC контролери)
 app.MapRazorPages();
-
-// Стартираме приложението
 app.Run();
+
+// рџ“Њ РњРµС‚РѕРґ Р·Р° СЃСЉР·РґР°РІР°РЅРµ РЅР° СЂРѕР»Рё Рё Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂСЃРєРё Р°РєР°СѓРЅС‚
+async Task SeedRolesAndAdmin(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+{
+    string[] roleNames = { "Admin", "User" };
+
+    foreach (var roleName in roleNames)
+    {
+        if (!await roleManager.RoleExistsAsync(roleName))
+        {
+            await roleManager.CreateAsync(new IdentityRole(roleName));
+        }
+    }
+
+    // рџ“Њ РЎСЉР·РґР°РІР°РЅРµ РЅР° Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂСЃРєРё Р°РєР°СѓРЅС‚
+    var adminEmail = "admin@powertracker.com";
+    var adminPassword = "Admin123!";
+
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    if (adminUser == null)
+    {
+        adminUser = new ApplicationUser { UserName = adminEmail, Email = adminEmail, FullName = "Administrator" };
+        await userManager.CreateAsync(adminUser, adminPassword);
+        await userManager.AddToRoleAsync(adminUser, "Admin");
+    }
+}

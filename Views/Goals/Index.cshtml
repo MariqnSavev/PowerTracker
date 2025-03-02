@@ -1,67 +1,144 @@
 ﻿@model IEnumerable<PowerTracker.Models.Goal>
 
 @{
-    ViewData["Title"] = "Цели";
+    ViewData["Title"] = "📈 Прогрес на теглото";
 }
 
-<h2 class="mb-4">@ViewData["Title"]</h2>
+<div class="container mt-4">
+    <div class="row">
+        <!-- Графика -->
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient-primary text-white text-center">
+                    <h4 class="mb-0">📊 Графика на теглото</h4>
+                </div>
+                <div class="card-body">
+                    <canvas id="goalChart"></canvas>
+                </div>
+            </div>
+        </div>
 
-<!-- 🔘 Бутон за създаване -->
-<a asp-action="Create" class="btn btn-success mb-3">➕ Създай нова цел</a>
+        <!-- Бутони за бързо управление -->
+        <div class="col-lg-4 d-flex align-items-center">
+            <div class="w-100 text-center">
+                <a asp-action="Create" class="btn btn-success btn-lg btn-block">
+                    ➕ Добави нова цел
+                </a>
+            </div>
+        </div>
+    </div>
 
-<table class="table table-bordered">
-    <thead class="thead-dark">
-        <tr>
-            <th>Име</th>
-            <th>Начални кг</th>
-            <th>Целеви кг</th>
-            <th>Начална дата</th>
-            <th>Крайна дата</th>
-            <th class="text-center">Опции</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var goal in Model)
-        {
-            <tr>
-                <td>@goal.Name</td>
-                <td>@goal.StartWeight</td>
-                <td>@goal.TargetWeight</td>
-                <td>@goal.StartDate.ToShortDateString()</td>
-                <td>@goal.EndDate.ToShortDateString()</td>
-                <td class="text-center">
-                    <a asp-action="Edit" asp-route-id="@goal.Id" class="btn btn-warning btn-sm">✏ Редактирай</a>
-                    <a asp-action="Details" asp-route-id="@goal.Id" class="btn btn-info btn-sm">👁 Преглед</a>
-                    <a asp-action="Delete" asp-route-id="@goal.Id" class="btn btn-danger btn-sm">🗑 Изтрий</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<!-- 📊 Графика за тегло -->
-<canvas id="goalsChart"></canvas>
+    <!-- Таблица с цели -->
+    <div class="card shadow-lg border-0 mt-4">
+        <div class="card-header bg-gradient-dark text-white">
+            <h4 class="mb-0">📋 Таблица с цели</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover table-striped text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>🏆 Цел</th>
+                        <th>⚖ Начално тегло (кг)</th>
+                        <th>🎯 Целево тегло (кг)</th>
+                        <th>📅 Начална дата</th>
+                        <th>⏳ Крайна дата</th>
+                        <th class="text-center">⚙ Опции</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var goal in Model)
+                    {
+                        <tr>
+                            <td><strong>@goal.Name</strong></td>
+                            <td class="text-primary fw-bold">@goal.StartWeight кг</td>
+                            <td class="text-danger fw-bold">@goal.TargetWeight кг</td>
+                            <td>@goal.StartDate.ToString("dd.MM.yyyy")</td>
+                            <td>@goal.EndDate.ToString("dd.MM.yyyy")</td>
+                            <td class="text-center">
+                                <a asp-action="Edit" asp-route-id="@goal.Id" class="btn btn-warning btn-sm">
+                                    ✏ Редакция
+                                </a>
+                                <a asp-action="Details" asp-route-id="@goal.Id" class="btn btn-info btn-sm">
+                                    👁 Детайли
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@goal.Id" class="btn btn-danger btn-sm">
+                                    🗑 Изтрий
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        var ctx = document.getElementById('goalsChart').getContext('2d');
+        document.addEventListener("DOMContentLoaded", function () {
+            var ctx = document.getElementById('goalChart').getContext('2d');
 
-        var chartData = {
-            labels: @Html.Raw(Json.Serialize(Model.Select(g => g.Name))),
-            datasets: [{
-                label: 'Тегло в кг',
-                data: @Html.Raw(Json.Serialize(Model.Select(g => g.TargetWeight))),
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        };
-
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: chartData,
-            options: { scales: { y: { beginAtZero: true } } }
+            var goalChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.Select(g => g.StartDate.ToString("dd.MM.yyyy")))),
+                    datasets: [{
+                        label: 'Начално тегло (кг)',
+                        data: @Html.Raw(Json.Serialize(Model.Select(g => g.StartWeight))),
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        pointRadius: 5,
+                        pointHoverRadius: 8
+                    }, {
+                        label: 'Целево тегло (кг)',
+                        data: @Html.Raw(Json.Serialize(Model.Select(g => g.TargetWeight))),
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        pointRadius: 5,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Тегло (кг)',
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Дата',
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         });
     </script>
 }
+
