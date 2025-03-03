@@ -62,6 +62,23 @@ namespace PowerTracker.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Goal",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartWeight = table.Column<double>(type: "float", nullable: false),
+                    TargetWeight = table.Column<double>(type: "float", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Goal", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Training",
                 columns: table => new
                 {
@@ -309,6 +326,9 @@ namespace PowerTracker.Migrations
 
             migrationBuilder.DropTable(
                 name: "Diet");
+
+            migrationBuilder.DropTable(
+                name: "Goal");
 
             migrationBuilder.DropTable(
                 name: "Training");

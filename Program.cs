@@ -1,79 +1,49 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PowerTracker.Data;
-using PowerTracker.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 📌 Връзка с базата данни
+// 📌 Добавяне на връзка с базата данни
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                         ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString, sqlOptions =>
-        sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(10),
-            errorNumbersToAdd: null)
-    )
-);
+    options.UseSqlServer(connectionString));
 
-// 📌 Настройка на Identity с роли
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// 📌 Добавяне на контролери с изгледи и Razor компилация
-builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+// 📌 Настройки за Identity (използва само вграден `IdentityUser`)
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false; // Потребителите могат да влизат без потвърждение на имейл
+})
+.AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// 📌 Създаване на роли при стартиране на приложението
-using (var scope = app.Services.CreateScope())
+if (app.Environment.IsDevelopment())
 {
-    var services = scope.ServiceProvider;
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-
-    await SeedRolesAndAdmin(roleManager, userManager);
+    app.UseMigrationsEndPoint();
+}
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"
-);
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.MapRazorPages();
 app.Run();
-
-// 📌 Метод за създаване на роли и администраторски акаунт
-async Task SeedRolesAndAdmin(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
-{
-    string[] roleNames = { "Admin", "User" };
-
-    foreach (var roleName in roleNames)
-    {
-        if (!await roleManager.RoleExistsAsync(roleName))
-        {
-            await roleManager.CreateAsync(new IdentityRole(roleName));
-        }
-    }
-
-    // 📌 Създаване на администраторски акаунт
-    var adminEmail = "admin@powertracker.com";
-    var adminPassword = "Admin123!";
-
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-    if (adminUser == null)
-    {
-        adminUser = new ApplicationUser { UserName = adminEmail, Email = adminEmail, FullName = "Administrator" };
-        await userManager.CreateAsync(adminUser, adminPassword);
-        await userManager.AddToRoleAsync(adminUser, "Admin");
-    }
-}

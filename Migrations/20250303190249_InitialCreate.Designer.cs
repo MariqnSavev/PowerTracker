@@ -12,8 +12,8 @@ using PowerTracker.Data;
 namespace PowerTracker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250228125036_AddGoalModel")]
-    partial class AddGoalModel
+    [Migration("20250303190249_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -318,8 +318,11 @@ namespace PowerTracker.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TargetCalories")
-                        .HasColumnType("int");
+                    b.Property<double>("StartWeight")
+                        .HasColumnType("float");
+
+                    b.Property<double>("TargetWeight")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
