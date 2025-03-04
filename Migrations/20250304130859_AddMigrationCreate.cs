@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PowerTracker.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class AddMigrationCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

@@ -1,17 +1,13 @@
 ﻿@model IEnumerable<PowerTracker.Models.Foods>
 
-@{
-    ViewData["Title"] = "Списък с храни";
-}
-
-<h2>@ViewData["Title"]</h2>
-<a asp-action="Create" class="btn btn-primary">Добави нова храна</a>
+<h2>Списък с храни</h2>
+<a asp-action="Create" class="btn btn-primary">Добави храна</a>
 
 <table class="table">
     <thead>
         <tr>
             <th>Име</th>
-            <th>Калории (100г)</th>
+            <th>Калории на 100 г</th>
             <th>Категория</th>
             <th>Действия</th>
         </tr>
@@ -24,8 +20,8 @@
                 <td>@item.CaloriesPer100g</td>
                 <td>@item.Category?.Name</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Редактирай</a>
                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Детайли</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Редактирай</a>
                     <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Изтрий</a>
                 </td>
             </tr>

@@ -20,8 +20,22 @@ namespace PowerTracker.Controllers
         // 📌 GET: Foods
         public async Task<IActionResult> Index()
         {
-            var foods = _context.Foods.Include(f => f.Category);
-            return View(await foods.ToListAsync());
+            var foods = await _context.Foods.Include(f => f.Category).ToListAsync();
+            return View(foods);
+        }
+
+        // 📌 GET: Foods/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var food = await _context.Foods
+                .Include(f => f.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (food == null) return NotFound();
+
+            return View(food);
         }
 
         // 📌 GET: Foods/Create
@@ -40,13 +54,11 @@ namespace PowerTracker.Controllers
 
             if (ModelState.IsValid)
             {
-                Console.WriteLine($"✅ Запазване на храна: {food.Name} | Категория: {food.CategoryId}");
                 _context.Add(food);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            Console.WriteLine("❌ Грешка при запазване на храна!");
             ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name", food.CategoryId);
             return View(food);
         }
@@ -99,6 +111,7 @@ namespace PowerTracker.Controllers
             var food = await _context.Foods
                 .Include(f => f.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (food == null) return NotFound();
 
             return View(food);
@@ -116,11 +129,6 @@ namespace PowerTracker.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool FoodExists(int id)
-        {
-            return _context.Foods.Any(e => e.Id == id);
         }
     }
 }

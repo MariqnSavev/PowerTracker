@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PowerTracker.Data;
-using PowerTracker.Models;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PowerTracker.Controllers
 {
@@ -16,13 +17,17 @@ namespace PowerTracker.Controllers
 
         public IActionResult Index()
         {
-            //var model = new HomePageViewModel
-           //{
-              //  Trainings = _context.Training.OrderByDescending(t => t.Date).Take(5).ToList(), // Последни 5 тренировки
-               // Diets = _context.Diet.OrderByDescending(d => d.Date).Take(5).ToList() // Последни 5 диети
-            //};
-
             return View();
+        }
+
+        /// 📌 Връща JSON с данните за графиката
+        public async Task<JsonResult> GetProgressData()
+        {
+            var data = await _context.Goal
+                .OrderBy(g => g.StartDate)
+                .Select(g => new { g.StartDate, g.StartWeight })
+                .ToListAsync();
+            return Json(data);
         }
     }
 }

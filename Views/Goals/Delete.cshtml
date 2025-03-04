@@ -1,33 +1,19 @@
 ﻿@model PowerTracker.Models.Goal
 
 @{
-    ViewData["Title"] = "Изтрий целта";
+    ViewData["Title"] = "Изтриване на цел";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h2>Сигурни ли сте, че искате да изтриете тази цел?</h2>
 
-<h4>Сигурни ли сте, че искате да изтриете тази цел?</h4>
-<hr />
+<table class="table">
+    <tr><th>Име:</th><td>@Model.Name</td></tr>
+    <tr><th>Начално тегло:</th><td>@Model.StartWeight кг</td></tr>
+    <tr><th>Целево тегло:</th><td>@Model.TargetWeight кг</td></tr>
+</table>
 
-<dl class="dl-horizontal">
-    <dt>Име</dt>
-    <dd>@Model.Name</dd>
-
-    <dt>Начално тегло (кг)</dt>
-    <dd>@Model.StartWeight</dd>
-
-    <dt>Целево тегло (кг)</dt>
-    <dd>@Model.TargetWeight</dd>
-
-    <dt>Начална дата</dt>
-    <dd>@Model.StartDate.ToShortDateString()</dd>
-
-    <dt>Крайна дата</dt>
-    <dd>@Model.EndDate.ToShortDateString()</dd>
-</dl>
-
-<form asp-action="DeleteConfirmed">
-    <input type="hidden" asp-for="Id" />
+<form asp-action="Delete" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
     <button type="submit" class="btn btn-danger">Изтрий</button>
-    <a asp-action="Index" class="btn btn-secondary">Назад</a>
+    <a asp-action="Index" class="btn btn-secondary">Отказ</a>
 </form>

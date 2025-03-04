@@ -12,8 +12,8 @@ using PowerTracker.Data;
 namespace PowerTracker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250303190249_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250304130859_AddMigrationCreate")]
+    partial class AddMigrationCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

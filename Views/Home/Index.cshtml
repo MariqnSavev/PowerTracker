@@ -1,98 +1,93 @@
-﻿@model PowerTracker.Models.HomePageViewModel
-
-@{
-    ViewData["Title"] = "Home Page";
+﻿@{
+    ViewData["Title"] = "Начало";
 }
 
-<div class="container mt-5">
-    <h2 class="text-center">Добре дошли в PowerTracker!</h2>
-    <p class="text-center">Проследявайте своите тренировки и диети тук!</p>
-
-    @if (User.Identity.IsAuthenticated)
-    {
-        <div class="text-center mb-4">
-            @Html.ActionLink("Добави нова тренировка", "Create", "Trainings", null, new { @class = "btn btn-primary mx-2" })
-            @Html.ActionLink("Добави храна", "Create", "Diets", null, new { @class = "btn btn-success mx-2" })
-        </div>
-
-        <div class="row">
-            <!-- Раздел за последните тренировки -->
-            <div class="col-md-6">
-                <h3 class="text-center">Последни тренировки</h3>
-                @if (Model?.Trainings != null && Model.Trainings.Any())
-                {
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <ul class="list-group list-group-flush">
-                                @foreach (var training in Model.Trainings)
-                                {
-                                    <li class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>@training.Date.ToShortDateString()</strong> - @training.Description
-                                                <p class="mb-0">
-                                                    <i class="fas fa-clock"></i> @training.DurationMinutes min |
-                                                    <i class="fas fa-burn"></i> @training.CaloriesBurned kcal
-                                                </p>
-                                            </div>
-                                            <span class="badge badge-primary badge-pill">@training.CaloriesBurned kcal</span>
-                                        </div>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <p class="text-center text-muted">Няма записани тренировки.</p>
-                }
-            </div>
-
-            <!-- Раздел за последни диетични записи -->
-            <div class="col-md-6">
-                <h3 class="text-center">Последни диетични записи</h3>
-                @if (Model?.Diets != null && Model.Diets.Any())
-                {
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <ul class="list-group list-group-flush">
-                                @foreach (var diet in Model.Diets)
-                                {
-                                    <li class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>@diet.Date.ToShortDateString()</strong> - @diet.Food.Name
-                                                <p class="mb-0">
-                                                    <i class="fas fa-utensils"></i> Quantity: @diet.QuantityInGrams g |
-                                                    Calories: @diet.Calories kcal
-                                                </p>
-                                            </div>
-                                            <span class="badge badge-success badge-pill">@diet.Calories kcal</span>
-                                        </div>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <p class="text-center text-muted">Няма записани храни.</p>
-                }
-            </div>
-        </div>
-
-        <!-- Добавяне на връзки към калкулаторите -->
-        <div class="text-center mt-4">
-            <a asp-controller="CalorieCalculator" asp-action="Index" class="btn btn-info mx-2">Calorie Calculator</a>
-            <a asp-controller="FoodCalculator" asp-action="Index" class="btn btn-warning mx-2">Food Calorie Calculator</a>
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-info text-center">
-            Моля, влезте в профила си, за да видите последните тренировки и диетични записи.
-        </div>
-    }
+<div class="text-center">
+    <h1 class="display-4">Добре дошли в PowerTracker</h1>
+    <p>Следете храните си, тренировките си и поставените цели!</p>
 </div>
+
+<div class="row">
+
+    <!-- Карта за Храни (Diet) -->
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm bg-dark text-light border-0">
+            <div class="card-body">
+                <h5 class="card-title">Диети</h5>
+                <p class="card-text">Управлявайте своите хранения и калории.</p>
+                <a asp-controller="Diets" asp-action="Index" class="btn btn-warning text-dark fw-bold">ПРЕГЛЕДАЙ</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Карта за Тренировки (Training) -->
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm bg-dark text-light border-0">
+            <div class="card-body">
+                <h5 class="card-title">Тренировки</h5>
+                <p class="card-text">Следете своите тренировки и прогрес.</p>
+                <a asp-controller="Trainings" asp-action="Index" class="btn btn-warning text-dark fw-bold">ПРЕГЛЕДАЙ</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Карта за Цели (Goals) -->
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm bg-dark text-light border-0">
+            <div class="card-body">
+                <h5 class="card-title">Цели</h5>
+                <p class="card-text">Поставете си цели и следете напредъка си.</p>
+                <a asp-controller="Goals" asp-action="Index" class="btn btn-warning text-dark fw-bold">ПРЕГЛЕДАЙ</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+<!-- Графика за прогреса -->
+<div class="mt-5 text-center">
+    <h2>Вашият напредък</h2>
+    <div style="max-width: 600px; margin: auto;">
+        <canvas id="progressChart"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var ctx = document.getElementById('progressChart').getContext('2d');
+
+            fetch('/Home/GetProgressData')
+                .then(response => response.json())
+                .then(data => {
+                    var labels = data.map(g => new Date(g.startDate).toLocaleDateString());
+                    var values = data.map(g => g.startWeight);
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: "Напредък в тегло (кг)",
+                                data: values,
+                                borderColor: 'blue',
+                                borderWidth: 2,
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: false
+                                }
+                            }
+                        }
+                    });
+                });
+        });
+    </script>
+}
+}

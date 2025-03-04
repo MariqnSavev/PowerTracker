@@ -16,13 +16,13 @@ namespace PowerTracker.Controllers
             _context = context;
         }
 
-        // 📌 GET: Goals (Всички цели)
+        // 📌 GET: Всички цели
         public async Task<IActionResult> Index()
         {
             return View(await _context.Goal.ToListAsync());
         }
 
-        // 📌 GET: Goals/Details/5
+        // 📌 GET: Детайли за цел
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -33,13 +33,13 @@ namespace PowerTracker.Controllers
             return View(goal);
         }
 
-        // 📌 GET: Goals/Create
+        // 📌 GET: Създаване на цел
         public IActionResult Create()
         {
             return View();
         }
 
-        // 📌 POST: Goals/Create
+        // 📌 POST: Създаване на цел
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,StartWeight,TargetWeight,StartDate,EndDate")] Goal goal)
@@ -53,7 +53,7 @@ namespace PowerTracker.Controllers
             return View(goal);
         }
 
-        // 📌 GET: Goals/Edit/5
+        // 📌 GET: Редактиране на цел
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -64,7 +64,7 @@ namespace PowerTracker.Controllers
             return View(goal);
         }
 
-        // 📌 POST: Goals/Edit/5
+        // 📌 POST: Редактиране на цел
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,StartWeight,TargetWeight,StartDate,EndDate")] Goal goal)
@@ -88,7 +88,7 @@ namespace PowerTracker.Controllers
             return View(goal);
         }
 
-        // 📌 GET: Goals/Delete/5
+        // 📌 GET: Изтриване на цел
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -99,10 +99,10 @@ namespace PowerTracker.Controllers
             return View(goal);
         }
 
-        // 📌 POST: Goals/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // 📌 POST: Изтриване на цел (БЕЗ DeleteConfirmed)
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var goal = await _context.Goal.FindAsync(id);
             if (goal != null)
