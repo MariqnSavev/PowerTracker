@@ -12,8 +12,8 @@ using PowerTracker.Data;
 namespace PowerTracker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250304130859_AddMigrationCreate")]
-    partial class AddMigrationCreate
+    [Migration("20250309153427_AddUserForeignKey")]
+    partial class AddUserForeignKey
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -249,13 +249,19 @@ namespace PowerTracker.Migrations
                     b.Property<double>("QuantityInGrams")
                         .HasColumnType("float");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("FoodId");
 
-                    b.ToTable("Diet");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Diets");
                 });
 
             modelBuilder.Entity("PowerTracker.Models.FoodCategories", b =>
@@ -324,9 +330,15 @@ namespace PowerTracker.Migrations
                     b.Property<double>("TargetWeight")
                         .HasColumnType("float");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Goal");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Goals");
                 });
 
             modelBuilder.Entity("PowerTracker.Models.Training", b =>
@@ -355,12 +367,18 @@ namespace PowerTracker.Migrations
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<double>("WeightInKg")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Training");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Trainings");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -428,9 +446,17 @@ namespace PowerTracker.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Category");
 
                     b.Navigation("Food");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PowerTracker.Models.Foods", b =>
@@ -442,6 +468,28 @@ namespace PowerTracker.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("PowerTracker.Models.Goal", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PowerTracker.Models.Training", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PowerTracker.Models.FoodCategories", b =>

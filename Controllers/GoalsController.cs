@@ -1,51 +1,69 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PowerTracker.Data;
 using PowerTracker.Models;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace PowerTracker.Controllers
 {
+    [Authorize] // 🚀 Само влезли потребители могат да управляват целите си
     public class GoalsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public GoalsController(ApplicationDbContext context)
+        public GoalsController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
-        // 📌 GET: Всички цели
+        // 📌 GET: Всички цели на текущия потребител
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Goal.ToListAsync());
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // ID на текущия потребител
+
+            var goals = _context.Goals
+                .Where(g => g.UserId == userId) // 🚀 Филтрираме само собствените записи
+                .AsNoTracking();
+
+            return View(await goals.ToListAsync());
         }
 
-        // 📌 GET: Детайли за цел
+        // 📌 GET: Детайли за цел (само ако тя принадлежи на текущия потребител)
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
-            var goal = await _context.Goal.FirstOrDefaultAsync(m => m.Id == id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var goal = await _context.Goals
+                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId); // 🚀 Проверяваме дали целта принадлежи на текущия потребител
+
             if (goal == null) return NotFound();
 
             return View(goal);
         }
 
-        // 📌 GET: Създаване на цел
+        // 📌 GET: Създаване на нова цел
         public IActionResult Create()
         {
             return View();
         }
 
-        // 📌 POST: Създаване на цел
+        // 📌 POST: Създаване на цел (автоматично добавяне на `UserId`)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,StartWeight,TargetWeight,StartDate,EndDate")] Goal goal)
         {
             if (ModelState.IsValid)
             {
+                goal.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier); // 🚀 Автоматично свързване на целта с потребителя
+
                 _context.Add(goal);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -53,26 +71,31 @@ namespace PowerTracker.Controllers
             return View(goal);
         }
 
-        // 📌 GET: Редактиране на цел
+        // 📌 GET: Редактиране на цел (само за собствени цели)
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
-            var goal = await _context.Goal.FindAsync(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var goal = await _context.Goals.FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId); // 🚀 Проверяваме дали потребителят притежава тази цел
             if (goal == null) return NotFound();
 
             return View(goal);
         }
 
-        // 📌 POST: Редактиране на цел
+        // 📌 POST: Редактиране на цел (само за собствени записи)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,StartWeight,TargetWeight,StartDate,EndDate")] Goal goal)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,StartWeight,TargetWeight,StartDate,EndDate,UserId")] Goal goal)
         {
             if (id != goal.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (goal.UserId != userId) return Unauthorized(); // 🚀 Защита: Потребителите не могат да редактират чужди цели
+
                 try
                 {
                     _context.Update(goal);
@@ -80,7 +103,7 @@ namespace PowerTracker.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Goal.Any(e => e.Id == goal.Id)) return NotFound();
+                    if (!_context.Goals.Any(e => e.Id == goal.Id)) return NotFound();
                     else throw;
                 }
                 return RedirectToAction(nameof(Index));
@@ -88,29 +111,152 @@ namespace PowerTracker.Controllers
             return View(goal);
         }
 
-        // 📌 GET: Изтриване на цел
+        // 📌 GET: Изтриване на цел (само за собствени цели)
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
-            var goal = await _context.Goal.FirstOrDefaultAsync(m => m.Id == id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var goal = await _context.Goals
+                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId); // 🚀 Само собствените записи
+
             if (goal == null) return NotFound();
 
             return View(goal);
         }
 
-        // 📌 POST: Изтриване на цел (БЕЗ DeleteConfirmed)
-        [HttpPost]
+        // 📌 POST: Изтриване на цел (само ако записът принадлежи на текущия потребител)
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var goal = await _context.Goal.FindAsync(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var goal = await _context.Goals.FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId); // 🚀 Само собствените записи
             if (goal != null)
             {
-                _context.Goal.Remove(goal);
+                _context.Goals.Remove(goal);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace PowerTracker.Models
 {
     public class Training
     {
+        [Key]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Моля, въведете дата на тренировката.")]
@@ -27,5 +30,159 @@ namespace PowerTracker.Models
         public double WeightInKg { get; set; } // Тегло на потребителя
 
         public double CaloriesBurned { get; set; } // Изчислени изгорени калории
+
+        // 🚀 Foreign Key към `IdentityUser`
+        [Required]
+        public string UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public virtual IdentityUser User { get; set; } // Връзка с ASP.NET Identity
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -42,20 +42,24 @@
                 var categoryId = $(this).val();
                 var foodDropdown = $("#foodDropdown");
 
-                foodDropdown.empty();
-                foodDropdown.append('<option value="">-- Зареждане... --</option>');
+                foodDropdown.empty().append('<option value="">-- Зареждане... --</option>');
 
                 if (categoryId) {
-                    $.getJSON('/Diets/GetFoodsByCategory', { categoryId: categoryId }, function (data) {
-                        foodDropdown.empty();
-                        foodDropdown.append('<option value="">-- Изберете храна --</option>');
-                        $.each(data, function (index, item) {
-                            foodDropdown.append($('<option>', {
-                                value: item.id,
-                                text: item.name
-                            }));
+                    $.getJSON('/Diets/GetFoodsByCategory', { categoryId: categoryId })
+                        .done(function (data) {
+                            foodDropdown.empty();
+                            foodDropdown.append('<option value="">-- Изберете храна --</option>');
+                            $.each(data, function (index, item) {
+                                foodDropdown.append($('<option>', {
+                                    value: item.id,
+                                    text: item.name
+                                }));
+                            });
+                        })
+                        .fail(function () {
+                            alert("Възникна грешка при зареждането на храните. Опитайте отново.");
+                            foodDropdown.empty().append('<option value="">-- Грешка при зареждане --</option>');
                         });
-                    });
                 } else {
                     foodDropdown.append('<option value="">-- Първо изберете категория --</option>');
                 }

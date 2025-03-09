@@ -23,7 +23,7 @@ namespace PowerTracker.Controllers
         /// 📌 Връща JSON с данните за графиката
         public async Task<JsonResult> GetProgressData()
         {
-            var data = await _context.Goal
+            var data = await _context.Goals
                 .OrderBy(g => g.StartDate)
                 .Select(g => new { g.StartDate, g.StartWeight })
                 .ToListAsync();
