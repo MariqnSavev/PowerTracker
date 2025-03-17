@@ -31,8 +31,8 @@ namespace PowerTracker.Models
         public DateTime Date { get; set; } = DateTime.Now;
 
         // 🚀 Foreign Key към потребителя
-        [Required]
-        public string UserId { get; set; }
+       
+       public string? UserId { get; set; }
 
         [ForeignKey("UserId")]
         public virtual IdentityUser User { get; set; }

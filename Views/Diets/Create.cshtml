@@ -9,14 +9,17 @@
 <form asp-action="Create">
     <div class="form-group">
         <label for="categoryDropdown" class="control-label">Категория</label>
-        <select id="categoryDropdown" name="CategoryId" class="form-control" asp-items="ViewBag.Categories">
+        <select id="categoryDropdown" class="form-control">
             <option value="">-- Изберете категория --</option>
+            @foreach (var category in ViewBag.Categories)
+            {
+                <option value="@category.Value">@category.Text</option>
+            }
         </select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label for="foodDropdown" class="control-label">Храна</label>
+        <label asp-for="FoodId" class="control-label">Храна</label>
         <select id="foodDropdown" name="FoodId" class="form-control">
             <option value="">-- Първо изберете категория --</option>
         </select>
@@ -47,8 +50,7 @@
                 if (categoryId) {
                     $.getJSON('/Diets/GetFoodsByCategory', { categoryId: categoryId })
                         .done(function (data) {
-                            foodDropdown.empty();
-                            foodDropdown.append('<option value="">-- Изберете храна --</option>');
+                            foodDropdown.empty().append('<option value="">-- Изберете храна --</option>');
                             $.each(data, function (index, item) {
                                 foodDropdown.append($('<option>', {
                                     value: item.id,
@@ -57,7 +59,7 @@
                             });
                         })
                         .fail(function () {
-                            alert("Възникна грешка при зареждането на храните. Опитайте отново.");
+                            alert("Грешка при зареждане на храните. Опитайте отново.");
                             foodDropdown.empty().append('<option value="">-- Грешка при зареждане --</option>');
                         });
                 } else {

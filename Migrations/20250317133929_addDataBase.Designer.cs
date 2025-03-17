@@ -12,8 +12,8 @@ using PowerTracker.Data;
 namespace PowerTracker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250309153427_AddUserForeignKey")]
-    partial class AddUserForeignKey
+    [Migration("20250317133929_addDataBase")]
+    partial class addDataBase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

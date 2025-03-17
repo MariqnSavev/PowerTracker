@@ -257,6 +257,3 @@ namespace PowerTracker.Controllers
 
 
 
-
-
-

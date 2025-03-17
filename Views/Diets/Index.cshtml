@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Diet>
+﻿@model IEnumerable<PowerTracker.Models.Diet>
 
 <h2 class="mt-3">Моите хранения</h2>
 <a class="btn btn-primary mb-3" asp-action="Create">Добави хранене</a>
@@ -18,7 +18,7 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Category.Name</td>
+                <td>@item.Food.Category.Name</td> <!-- Поправено -->
                 <td>@item.Food.Name</td>
                 <td>@item.QuantityInGrams</td>
                 <td>@item.Calories</td>

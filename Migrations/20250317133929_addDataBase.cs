@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PowerTracker.Migrations
 {
-    public partial class AddUserForeignKey : Migration
+    public partial class addDataBase : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
