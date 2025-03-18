@@ -12,7 +12,7 @@ using PowerTracker.Models;
 
 namespace PowerTracker.Controllers
 {
-    [Authorize] // 🚀 Само влезли потребители могат да управляват тренировките си
+    [Authorize(Roles = "User")]
     public class TrainingsController : Controller
     {
         private readonly ApplicationDbContext _context;

@@ -6,13 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using PowerTracker.Data;
 using PowerTracker.Models;
 using System.Security.Claims;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-
-
 
 namespace PowerTracker.Controllers
 {
-    [Authorize] // Само влезли потребители могат да управляват храненията си
+    [Authorize(Roles = "User")] // 🔒 Само потребителите с роля "User" имат достъп
     public class DietsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -59,7 +56,6 @@ namespace PowerTracker.Controllers
             return View(diet);
         }
 
-
         // 📌 GET: Създаване на хранене
         public IActionResult Create(Diet model)
         {
@@ -95,7 +91,6 @@ namespace PowerTracker.Controllers
             ViewBag.Foods = new SelectList(_context.Foods.Where(f => f.CategoryId == CategoryId), "Id", "Name", diet.FoodId);
             return View(diet);
         }
-
 
         // 📌 GET: Редактиране на хранене
         public async Task<IActionResult> Edit(int? id)
@@ -159,9 +154,9 @@ namespace PowerTracker.Controllers
             if (id == null) return NotFound();
 
             var diet = await _context.Diets
-       .Include(d => d.Food) // Зареждаме Food
-       .ThenInclude(f => f.Category) // Зареждаме FoodCategory
-       .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(d => d.Food) // Зареждаме Food
+                .ThenInclude(f => f.Category) // Зареждаме FoodCategory
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (diet == null)
             {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PowerTracker.Data;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace PowerTracker.Controllers
 {
+    [Authorize(Roles = "Admin")] // 🔒 Само администраторите имат достъп
     public class FoodsController : Controller
     {
         private readonly ApplicationDbContext _context;
