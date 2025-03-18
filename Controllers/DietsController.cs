@@ -61,7 +61,7 @@ namespace PowerTracker.Controllers
 
 
         // 📌 GET: Създаване на хранене
-        public IActionResult Create(Model diet)
+        public IActionResult Create(Diet model)
         {
             ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name");
             ViewBag.Foods = new SelectList(new List<Foods>(), "Id", "Name");

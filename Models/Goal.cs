@@ -28,10 +28,12 @@ namespace PowerTracker.Models
         public DateTime EndDate { get; set; }
 
         // 🚀 Foreign Key към потребителя
-        
+
         public string? UserId { get; set; }
 
         [ForeignKey("UserId")]
-        public virtual IdentityUser User { get; set; }
+        public virtual IdentityUser? User { get; set; }
     }
 }
+
+

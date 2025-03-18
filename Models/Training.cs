@@ -32,18 +32,13 @@ namespace PowerTracker.Models
         public double CaloriesBurned { get; set; } // Изчислени изгорени калории
 
         // 🚀 Foreign Key към `IdentityUser`
-      
+
         public string? UserId { get; set; }
 
         [ForeignKey("UserId")]
-        public virtual IdentityUser User { get; set; } // Връзка с ASP.NET Identity
+        public virtual IdentityUser? User { get; set; } // Връзка с ASP.NET Identity
     }
 }
-
-
-
-
-
 
 
 

@@ -29,12 +29,12 @@ namespace PowerTracker.Data
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade); // Ако потребителят бъде изтрит, тренировките му също се трият
 
-            // 🚀 Foreign Key за Diet (връзка с Category)
-            modelBuilder.Entity<Diet>()
-                .HasOne(d => d.Category)
-                .WithMany()
-                .HasForeignKey(d => d.CategoryId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //// 🚀 Foreign Key за Diet (връзка с Category)
+            //modelBuilder.Entity<Diet>()
+            //    .HasOne(d => d.Category)
+            //    .WithMany()
+            //    .HasForeignKey(d => d.CategoryId)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             // 🚀 Foreign Key за Diet (връзка с Food)
             modelBuilder.Entity<Diet>()

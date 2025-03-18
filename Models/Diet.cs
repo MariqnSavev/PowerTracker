@@ -10,17 +10,17 @@ namespace PowerTracker.Models
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Моля, изберете категория.")]
-        public int CategoryId { get; set; }
+        //[Required(ErrorMessage = "Моля, изберете категория.")]
+        //public int CategoryId { get; set; }
 
-        [ForeignKey("CategoryId")]
-        public virtual FoodCategories Category { get; set; }
+        //[ForeignKey("CategoryId")]
+        //public virtual FoodCategories Category { get; set; }
 
         [Required(ErrorMessage = "Моля, изберете храна.")]
         public int FoodId { get; set; }
 
         [ForeignKey("FoodId")]
-        public virtual Foods Food { get; set; }
+        public virtual Foods? Food { get; set; }
 
         [Required(ErrorMessage = "Моля, въведете количество.")]
         [Range(1, 2000, ErrorMessage = "Количеството трябва да бъде между 1 и 2000 грама.")]
@@ -31,15 +31,12 @@ namespace PowerTracker.Models
         public DateTime Date { get; set; } = DateTime.Now;
 
         // 🚀 Foreign Key към потребителя
-       
-       public string? UserId { get; set; }
+        public string? UserId { get; set; }
 
         [ForeignKey("UserId")]
-        public virtual IdentityUser User { get; set; }
+        public virtual IdentityUser? User { get; set; }
     }
 }
-
-
 
 
 
