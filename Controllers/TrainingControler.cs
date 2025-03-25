@@ -12,7 +12,7 @@ using PowerTracker.Models;
 
 namespace PowerTracker.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize]
     public class TrainingsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -87,7 +87,7 @@ namespace PowerTracker.Controllers
             {
                 training.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier); // 🚀 Автоматично свързване на тренировката с потребителя
                 training.CaloriesBurned = CalculateCaloriesBurned(training.Activity, training.DurationMinutes, training.WeightInKg);
-
+                training.Date = DateTime.Now; // Принудително задаване на днешна дата
                 _context.Add(training);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

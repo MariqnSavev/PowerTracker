@@ -9,7 +9,8 @@ using System.Security.Claims;
 
 namespace PowerTracker.Controllers
 {
-    [Authorize(Roles = "User")] // 🔒 Само потребителите с роля "User" имат достъп
+
+    [Authorize]
     public class DietsController : Controller
     {
         private readonly ApplicationDbContext _context;

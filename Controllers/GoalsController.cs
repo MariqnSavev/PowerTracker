@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PowerTracker.Controllers
 {
-    [Authorize(Roles = "User")] // 🔒 Само потребителите с роля "User" имат достъп
+    [Authorize]
     public class GoalsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -88,17 +87,22 @@ namespace PowerTracker.Controllers
         // 📌 POST: Редактиране на цел (само за собствени записи)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,StartWeight,TargetWeight,StartDate,EndDate,UserId")] Goal goal)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,StartWeight,TargetWeight,StartDate,EndDate")] Goal goal)
         {
             if (id != goal.Id) return NotFound();
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Ако целта не принадлежи на потребителя, връщаме Unauthorized
+            if (goal.UserId != userId) return Unauthorized();
+
             if (ModelState.IsValid)
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (goal.UserId != userId) return Unauthorized(); // 🚀 Защита: Потребителите не могат да редактират чужди цели
-
                 try
                 {
+                    // Премахваме UserId от полето за актуализация, защото не трябва да се променя
+                    goal.UserId = userId;
+
                     _context.Update(goal);
                     await _context.SaveChangesAsync();
                 }
@@ -144,6 +148,7 @@ namespace PowerTracker.Controllers
         }
     }
 }
+
 
 
 

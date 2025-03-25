@@ -9,10 +9,9 @@ namespace PowerTracker.Models
     {
         [Key]
         public int Id { get; set; }
-
         [Required(ErrorMessage = "Моля, въведете дата на тренировката.")]
         [DataType(DataType.Date)]
-        public DateTime Date { get; set; }
+        public DateTime Date { get; set; } = DateTime.Now; // Автоматично задаване на днешната дата
 
         [Required(ErrorMessage = "Моля, въведете описание на тренировката.")]
         [StringLength(500, ErrorMessage = "Описанието не може да бъде по-дълго от 500 символа.")]
@@ -30,6 +29,7 @@ namespace PowerTracker.Models
         public double WeightInKg { get; set; } // Тегло на потребителя
 
         public double CaloriesBurned { get; set; } // Изчислени изгорени калории
+
 
         // 🚀 Foreign Key към `IdentityUser`
 
