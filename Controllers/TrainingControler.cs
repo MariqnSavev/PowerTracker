@@ -24,10 +24,9 @@ namespace PowerTracker.Controllers
             _userManager = userManager;
         }
 
-        // Метод за изчисление на калориите
+        // Helper method to calculate calories burned
         private double CalculateCaloriesBurned(string activity, int durationMinutes, double weight)
         {
-            // MET стойности за различни тренировки
             var metValues = new Dictionary<string, double>
             {
                 { "Running", 9.8 },
@@ -36,58 +35,59 @@ namespace PowerTracker.Controllers
                 { "Weightlifting", 6.0 }
             };
 
-            if (metValues.ContainsKey(activity))
-            {
-                double met = metValues[activity];
-                return (met * weight * durationMinutes) / 60.0; // Формула за изчисление на калории
-            }
-
-            return 0.0; // Ако видът на тренировката не е намерен
+            return metValues.ContainsKey(activity)
+                ? (metValues[activity] * weight * durationMinutes) / 60.0
+                : 0.0;
         }
 
-        // 📌 GET: Trainings (само тренировките на текущия потребител)
+        // GET: Trainings
         public async Task<IActionResult> Index()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // ID на текущия потребител
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var trainings = await _context.Trainings
+                .Where(t => t.UserId == userId)
+                .OrderByDescending(t => t.Date)
+                .AsNoTracking()
+                .ToListAsync();
 
-            var trainings = _context.Trainings
-                .Where(t => t.UserId == userId) // 🚀 Филтрираме само собствените записи
-                .AsNoTracking();
-
-            return View(await trainings.ToListAsync());
+            return View(trainings);
         }
 
-        // 📌 GET: Trainings/Details/5 (само ако тя принадлежи на текущия потребител)
+        // GET: Trainings/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             var training = await _context.Trainings
-                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId); // 🚀 Проверяваме дали тренировката принадлежи на текущия потребител
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
-            if (training == null) return NotFound();
-
-            return View(training);
+            return training == null ? NotFound() : View(training);
         }
 
-        // 📌 GET: Trainings/Create
+        // GET: Trainings/Create
         public IActionResult Create()
         {
-            return View();
+            return View(new Training
+            {
+                Date = DateTime.Now,
+                WeightInKg = 70 // Default weight, can be changed
+            });
         }
 
-        // 📌 POST: Trainings/Create (автоматично добавяне на `UserId`)
+        // POST: Trainings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Date,Description,Activity,DurationMinutes,WeightInKg")] Training training)
         {
             if (ModelState.IsValid)
             {
-                training.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier); // 🚀 Автоматично свързване на тренировката с потребителя
-                training.CaloriesBurned = CalculateCaloriesBurned(training.Activity, training.DurationMinutes, training.WeightInKg);
-                training.Date = DateTime.Now; // Принудително задаване на днешна дата
+                training.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                training.CaloriesBurned = CalculateCaloriesBurned(
+                    training.Activity,
+                    training.DurationMinutes,
+                    training.WeightInKg);
+
                 _context.Add(training);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -95,76 +95,95 @@ namespace PowerTracker.Controllers
             return View(training);
         }
 
-        // 📌 GET: Trainings/Edit/5 (само за собствени тренировки)
+        // GET: Trainings/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var training = await _context.Trainings.FindAsync(id);
 
-            var training = await _context.Trainings.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId); // 🚀 Проверяваме дали потребителят притежава тази тренировка
-            if (training == null) return NotFound();
+            if (training == null || training.UserId != userId)
+                return NotFound();
 
             return View(training);
         }
 
-        // 📌 POST: Trainings/Edit/5 (само за собствени записи)
+        // POST: Trainings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Description,Activity,DurationMinutes,WeightInKg,UserId")] Training training)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,Date,Description,Activity,DurationMinutes,WeightInKg")] Training training)
         {
             if (id != training.Id) return NotFound();
 
+            // Verify ownership
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (training.UserId != userId) return Unauthorized();
+
             if (ModelState.IsValid)
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (training.UserId != userId) return Unauthorized(); // 🚀 Защита: Потребителите не могат да редактират чужди тренировки
-
                 try
                 {
-                    training.CaloriesBurned = CalculateCaloriesBurned(training.Activity, training.DurationMinutes, training.WeightInKg);
+                    // Recalculate calories
+                    training.CaloriesBurned = CalculateCaloriesBurned(
+                        training.Activity,
+                        training.DurationMinutes,
+                        training.WeightInKg);
+
                     _context.Update(training);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Trainings.Any(e => e.Id == training.Id)) return NotFound();
-                    else throw;
+                    if (!TrainingExists(training.Id))
+                        return NotFound();
+                    throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
             return View(training);
         }
 
-        // 📌 GET: Trainings/Delete/5 (само за собствени тренировки)
+        // GET: Trainings/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             var training = await _context.Trainings
-                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId); // 🚀 Само собствените записи
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
-            if (training == null) return NotFound();
-
-            return View(training);
+            return training == null ? NotFound() : View(training);
         }
 
-        // 📌 POST: Trainings/Delete/5 (само ако записът принадлежи на текущия потребител)
+        // POST: Trainings/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var training = await _context.Trainings
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
-            var training = await _context.Trainings.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId); // 🚀 Само собствените записи
             if (training != null)
             {
                 _context.Trainings.Remove(training);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        private bool TrainingExists(int id)
+        {
+            return _context.Trainings.Any(e => e.Id == id);
+        }
+
+        // AJAX endpoint to calculate calories (optional)
+        [HttpGet]
+        public IActionResult CalculateCalories(string activity, int duration, double weight)
+        {
+            var calories = CalculateCaloriesBurned(activity, duration, weight);
+            return Json(new { calories });
         }
     }
 }

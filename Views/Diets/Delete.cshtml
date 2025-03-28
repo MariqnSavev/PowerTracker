@@ -10,26 +10,43 @@
 <div>
     <h4>Диета</h4>
     <hr />
-    <dl class="dl-horizontal">
-        <dt>Категория</dt>
-        <dd>@Model.Food.Category.Name</dd> <!-- Поправено -->
-
-        <dt>Храна</dt>
-        <dd>@Model.Food.Name</dd>
-
-        <dt>Количество (г)</dt>
-        <dd>@Model.QuantityInGrams</dd>
-
-        <dt>Калории</dt>
-        <dd>@Model.Calories</dd>
-
-        <dt>Дата</dt>
-        <dd>@Model.Date.ToString("yyyy-MM-dd")</dd>
+    <dl class="row">
+        <dt class="col-sm-2">
+            Категория
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Food?.Category?.Name
+        </dd>
+        <dt class="col-sm-2">
+            Храна
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Food?.Name
+        </dd>
+        <dt class="col-sm-2">
+            Количество (г)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.QuantityInGrams
+        </dd>
+        <dt class="col-sm-2">
+            Калории
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Calories.ToString("N0")
+        </dd>
+        <dt class="col-sm-2">
+            Дата
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Date.ToString("yyyy-MM-dd HH:mm")
+        </dd>
     </dl>
 
-    <form asp-action="DeleteConfirmed">
+    <form asp-action="Delete">
+        @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
-        <button type="submit" class="btn btn-danger">Изтрий</button>
+        <input type="submit" value="Изтрий" class="btn btn-danger" />
         <a asp-action="Index" class="btn btn-secondary">Отказ</a>
     </form>
 </div>

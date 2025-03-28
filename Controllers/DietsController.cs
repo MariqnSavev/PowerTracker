@@ -9,7 +9,6 @@ using System.Security.Claims;
 
 namespace PowerTracker.Controllers
 {
-
     [Authorize]
     public class DietsController : Controller
     {
@@ -22,7 +21,7 @@ namespace PowerTracker.Controllers
             _userManager = userManager;
         }
 
-        // 📌 GET: Всички хранения на текущия потребител
+        // GET: All diets for current user
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -30,52 +29,44 @@ namespace PowerTracker.Controllers
             var diets = await _context.Diets
                 .Where(d => d.UserId == userId)
                 .Include(d => d.Food)
-                .ThenInclude(f => f.Category) // 🔥 Зареждане на категорията на храната
+                .ThenInclude(f => f.Category)
+                .OrderByDescending(d => d.Date)
                 .ToListAsync();
 
             return View(diets);
         }
 
-        // 📌 GET: Детайли за хранене
+        // GET: Diet details
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var diet = await _context.Diets
-                .Include(d => d.Food) // Важно: зарежда Food
-                .ThenInclude(f => f.Category) // Важно: зарежда FoodCategory
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(d => d.Food)
+                .ThenInclude(f => f.Category)
+                .FirstOrDefaultAsync(d => d.Id == id && d.UserId == userId);
 
-            if (diet == null)
-            {
-                return NotFound();
-            }
-
-            return View(diet);
+            return diet == null ? NotFound() : View(diet);
         }
 
-        // 📌 GET: Създаване на хранене
-        public IActionResult Create(Diet model)
+        // GET: Create diet
+        public IActionResult Create()
         {
             ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name");
             ViewBag.Foods = new SelectList(new List<Foods>(), "Id", "Name");
-            return View();
+            return View(new Diet { Date = DateTime.Now });
         }
 
-        // 📌 POST: Създаване на хранене
+        // POST: Create diet
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int CategoryId, [Bind("FoodId,QuantityInGrams")] Diet diet)
+        public async Task<IActionResult> Create([Bind("FoodId,QuantityInGrams,Date")] Diet diet, int CategoryId)
         {
             if (ModelState.IsValid)
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userId)) return Unauthorized(); // 🛑 Ако няма влязъл потребител
-
-                diet.UserId = userId; // 🚀 Задаване на текущия потребител
+                diet.UserId = userId;
 
                 var food = await _context.Foods.FindAsync(diet.FoodId);
                 if (food != null)
@@ -93,38 +84,40 @@ namespace PowerTracker.Controllers
             return View(diet);
         }
 
-        // 📌 GET: Редактиране на хранене
+        // GET: Edit diet
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             var diet = await _context.Diets
                 .Include(d => d.Food)
                 .FirstOrDefaultAsync(d => d.Id == id && d.UserId == userId);
 
             if (diet == null) return NotFound();
 
-            var categoryId = diet.Food.CategoryId;
+            var categoryId = diet.Food?.CategoryId ?? 0;
 
             ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name", categoryId);
-            ViewBag.Foods = new SelectList(_context.Foods.Where(f => f.CategoryId == categoryId), "Id", "Name", diet.FoodId);
+            ViewBag.Foods = new SelectList(
+                _context.Foods.Where(f => f.CategoryId == categoryId),
+                "Id", "Name", diet.FoodId);
+
             return View(diet);
         }
 
-        // 📌 POST: Редактиране на хранене
+        // POST: Edit diet
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, int CategoryId, [Bind("Id,FoodId,QuantityInGrams,Calories,Date,UserId")] Diet diet)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FoodId,QuantityInGrams,Date,UserId")] Diet diet, int CategoryId)
         {
             if (id != diet.Id) return NotFound();
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (diet.UserId != userId) return Unauthorized();
+
             if (ModelState.IsValid)
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (diet.UserId != userId) return Unauthorized();
-
                 try
                 {
                     var food = await _context.Foods.FindAsync(diet.FoodId);
@@ -135,13 +128,13 @@ namespace PowerTracker.Controllers
 
                     _context.Update(diet);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Diets.Any(e => e.Id == diet.Id)) return NotFound();
-                    else throw;
+                    if (!DietExists(diet.Id)) return NotFound();
+                    throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
 
             ViewBag.Categories = new SelectList(_context.FoodCategories, "Id", "Name", CategoryId);
@@ -149,41 +142,36 @@ namespace PowerTracker.Controllers
             return View(diet);
         }
 
-        // 📌 GET: Изтриване на хранене
+        // GET: Delete diet
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var diet = await _context.Diets
-                .Include(d => d.Food) // Зареждаме Food
-                .ThenInclude(f => f.Category) // Зареждаме FoodCategory
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(d => d.Food)
+                .ThenInclude(f => f.Category)
+                .FirstOrDefaultAsync(d => d.Id == id && d.UserId == userId);
 
-            if (diet == null)
-            {
-                return NotFound();
-            }
-
-            return View(diet);
+            return diet == null ? NotFound() : View(diet);
         }
 
-        // 📌 POST: Изтриване на хранене
+        // POST: Delete diet
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             var diet = await _context.Diets.FirstOrDefaultAsync(d => d.Id == id && d.UserId == userId);
-            if (diet != null)
-            {
-                _context.Diets.Remove(diet);
-                await _context.SaveChangesAsync();
-            }
+
+            if (diet == null) return NotFound();
+
+            _context.Diets.Remove(diet);
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        // 📌 AJAX: Зареждане на храни по избрана категория
+        // AJAX: Get foods by category
         [HttpGet]
         public JsonResult GetFoodsByCategory(int categoryId)
         {
@@ -192,6 +180,11 @@ namespace PowerTracker.Controllers
                 .Select(f => new { id = f.Id, name = f.Name })
                 .ToList();
             return Json(foods);
+        }
+
+        private bool DietExists(int id)
+        {
+            return _context.Diets.Any(e => e.Id == id);
         }
     }
 }
