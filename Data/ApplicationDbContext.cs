@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+        using Microsoft.EntityFrameworkCore;
 using PowerTracker.Models;
 
 namespace PowerTracker.Data
@@ -12,10 +12,9 @@ namespace PowerTracker.Data
         {
         }
 
-        public DbSet<Diet> Diets { get; set; }
+        
         public DbSet<Training> Trainings { get; set; }
-        public DbSet<Foods> Foods { get; set; }
-        public DbSet<FoodCategories> FoodCategories { get; set; }
+       
         public DbSet<Goal> Goals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -36,20 +35,8 @@ namespace PowerTracker.Data
             //    .HasForeignKey(d => d.CategoryId)
             //    .OnDelete(DeleteBehavior.Restrict);
 
-            // 🚀 Foreign Key за Diet (връзка с Food)
-            modelBuilder.Entity<Diet>()
-                .HasOne(d => d.Food)
-                .WithMany()
-                .HasForeignKey(d => d.FoodId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // 🚀 Foreign Key за Diet (връзка с потребителя)
-            modelBuilder.Entity<Diet>()
-                .HasOne(d => d.User)
-                .WithMany()
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
+        
+            //
             // 🚀 Foreign Key за Goal (връзка с потребителя)
             modelBuilder.Entity<Goal>()
                 .HasOne(g => g.User)
@@ -57,6 +44,8 @@ namespace PowerTracker.Data
                 .HasForeignKey(g => g.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
+
+        public DbSet<PowerTracker.Models.Food>? Food { get; set; }
     }
 }
 

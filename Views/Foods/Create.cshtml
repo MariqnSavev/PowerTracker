@@ -1,38 +1,106 @@
-﻿@model PowerTracker.Models.Foods
+﻿@model PowerTracker.Models.Food
 
 @{
     ViewData["Title"] = "Добави нова храна";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div class="form-group">
+                    <label asp-for="Name">Име на храната*</label>
+                    <input asp-for="Name" class="form-control" placeholder="Напр. Домати, Пилешко гърди" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
 
-<form asp-action="Create">
-    <div class="form-group">
-        <label asp-for="Name" class="control-label">Име на храната</label>
-        <input asp-for="Name" class="form-control" required />
-        <span asp-validation-for="Name" class="text-danger"></span>
+                <div class="row mt-3">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Calories">Калории*</label>
+                            <input asp-for="Calories" class="form-control" placeholder="Напр. 150" />
+                            <span asp-validation-for="Calories" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Protein">Протеин (g)*</label>
+                            <input asp-for="Protein" class="form-control" placeholder="Напр. 25" />
+                            <span asp-validation-for="Protein" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Fat">Мазнини (g)*</label>
+                            <input asp-for="Fat" class="form-control" placeholder="Напр. 5" />
+                            <span asp-validation-for="Fat" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Carbs">Въглехидрати (g)*</label>
+                            <input asp-for="Carbs" class="form-control" placeholder="Напр. 30" />
+                            <span asp-validation-for="Carbs" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="ServingSize">Размер на порция (g)*</label>
+                            <input asp-for="ServingSize" class="form-control" value="100" />
+                            <span asp-validation-for="ServingSize" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Brand">Марка</label>
+                            <input asp-for="Brand" class="form-control" placeholder="Напр. Nestle, Балкан" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label asp-for="Barcode">Баркод</label>
+                    <input asp-for="Barcode" class="form-control" placeholder="По избор" />
+                </div>
+
+                <div class="form-group mt-3">
+                    <label asp-for="PhotoUrl">URL на снимка</label>
+                    <input asp-for="PhotoUrl" class="form-control" placeholder="https://..." />
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Запази
+                    </button>
+                    < asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Отказ
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="CaloriesPer100g" class="control-label">Калории на 100 г</label>
-        <input asp-for="CaloriesPer100g" type="number" class="form-control" required />
-        <span asp-validation-for="CaloriesPer100g" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CategoryId" class="control-label">Категория</label>
-        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
-            <option value="">-- Изберете категория --</option>
-        </select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-success">Запази</button>
-    <a asp-action="Index" class="btn btn-secondary">Отказ</a>
-</form>
+</div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Автоматично изчисляване на хранителни стойности при промяна на размера на порцията
+        $(document).ready(function() {
+            $('#ServingSize').change(function() {
+                const servingSize = parseFloat($(this).val()) || 100;
+                const baseSize = 100; // База 100g
+
+                $('#Calories').val(($('#Calories').val() / baseSize * servingSize).toFixed(1));
+                $('#Protein').val(($('#Protein').val() / baseSize * servingSize).toFixed(1));
+                $('#Fat').val(($('#Fat').val() / baseSize * servingSize).toFixed(1));
+                $('#Carbs').val(($('#Carbs').val() / baseSize * servingSize).toFixed(1));
+            });
+        });
+    </script>
 }

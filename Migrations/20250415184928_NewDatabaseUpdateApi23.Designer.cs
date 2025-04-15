@@ -12,8 +12,8 @@ using PowerTracker.Data;
 namespace PowerTracker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250318131219_DatabaseNew")]
-    partial class DatabaseNew
+    [Migration("20250415184928_NewDatabaseUpdateApi23")]
+    partial class NewDatabaseUpdateApi23
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -247,19 +247,16 @@ namespace PowerTracker.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FoodId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Diets");
                 });
 
-            modelBuilder.Entity("PowerTracker.Models.FoodCategories", b =>
+            modelBuilder.Entity("PowerTracker.Models.Food", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -267,38 +264,44 @@ namespace PowerTracker.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<string>("Barcode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.Property<string>("Brand")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("FoodCategories");
-                });
-
-            modelBuilder.Entity("PowerTracker.Models.Foods", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<double>("CaloriesPer100g")
+                    b.Property<double>("Calories")
                         .HasColumnType("float");
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
+                    b.Property<double>("Carbs")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("DateAdded")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("Fat")
+                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PhotoUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Protein")
+                        .HasColumnType("float");
+
+                    b.Property<double>("ServingSize")
+                        .HasColumnType("float");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("Foods");
+                    b.ToTable("Food");
                 });
 
             modelBuilder.Entity("PowerTracker.Models.Goal", b =>
@@ -326,7 +329,6 @@ namespace PowerTracker.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -363,7 +365,6 @@ namespace PowerTracker.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<double>("WeightInKg")
@@ -429,32 +430,12 @@ namespace PowerTracker.Migrations
 
             modelBuilder.Entity("PowerTracker.Models.Diet", b =>
                 {
-                    b.HasOne("PowerTracker.Models.Foods", "Food")
-                        .WithMany()
-                        .HasForeignKey("FoodId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Food");
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("PowerTracker.Models.Foods", b =>
-                {
-                    b.HasOne("PowerTracker.Models.FoodCategories", "Category")
-                        .WithMany("Foods")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("PowerTracker.Models.Goal", b =>
@@ -462,8 +443,7 @@ namespace PowerTracker.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });
@@ -473,15 +453,9 @@ namespace PowerTracker.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("PowerTracker.Models.FoodCategories", b =>
-                {
-                    b.Navigation("Foods");
                 });
 #pragma warning restore 612, 618
         }

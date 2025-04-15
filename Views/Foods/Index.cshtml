@@ -1,30 +1,96 @@
-﻿@model IEnumerable<PowerTracker.Models.Foods>
+﻿@model IEnumerable<PowerTracker.Models.Food>
 
-<h2>Списък с храни</h2>
-<a asp-action="Create" class="btn btn-primary">Добави храна</a>
+@{
+    ViewData["Title"] = "Храни";
+}
 
-<table class="table">
-    <thead>
+<h2 class="mb-4">Списък с храни</h2>
+
+<!-- Съобщения -->
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<!-- Търсене на храна -->
+<form asp-action="Search" method="post" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="query" class="form-control" placeholder="Въведи храна за търсене..." required />
+        <button type="submit" class="btn btn-primary">Търси</button>
+    </div>
+</form>
+
+<!-- Таблица с храни -->
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
         <tr>
             <th>Име</th>
-            <th>Калории на 100 г</th>
-            <th>Категория</th>
+            <th>Калории</th>
+            <th>Протеин (g)</th>
+            <th>Мазнини (g)</th>
+            <th>Въглехидрати (g)</th>
+            <th>Дата</th>
             <th>Действия</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var food in Model)
         {
             <tr>
-                <td>@item.Name</td>
-                <td>@item.CaloriesPer100g</td>
-                <td>@item.Category?.Name</td>
+                <td>@food.Name</td>
+                <td>@food.Calories</td>
+                <td>@food.Protein</td>
+                <td>@food.Fat</td>
+                <td>@food.Carbs</td>
+                <td>@food.DateAdded.ToString("dd.MM.yyyy")</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Детайли</a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Редактирай</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Изтрий</a>
+                    <a asp-action="Edit" asp-route-id="@food.Id" class="btn btn-warning btn-sm">Редактирай</a>
+                    <a asp-action="Delete" asp-route-id="@food.Id" class="btn btn-danger btn-sm">Изтрий</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<!-- Графика с макроси -->
+<div class="mt-5">
+    <h4>Общо макронутриенти</h4>
+    <canvas id="summaryChart" width="600" height="300"></canvas>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('summaryChart').getContext('2d');
+
+        const summaryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Калории', 'Протеин', 'Въглехидрати', 'Мазнини'],
+                datasets: [{
+                    label: 'Общо',
+                    data: [
+        @ViewData["TotalCalories"],
+        @ViewData["TotalProtein"],
+        @ViewData["TotalCarbs"],
+        @ViewData["TotalFat"]
+                    ],
+                    backgroundColor: ['#f87171', '#60a5fa', '#34d399', '#fbbf24'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+}

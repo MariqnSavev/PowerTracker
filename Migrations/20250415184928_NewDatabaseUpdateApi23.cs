@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PowerTracker.Migrations
 {
-    public partial class addDataBase : Migration
+    public partial class NewDatabaseUpdateApi23 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -49,16 +49,26 @@ namespace PowerTracker.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FoodCategories",
+                name: "Food",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Calories = table.Column<double>(type: "float", nullable: false),
+                    Protein = table.Column<double>(type: "float", nullable: false),
+                    Fat = table.Column<double>(type: "float", nullable: false),
+                    Carbs = table.Column<double>(type: "float", nullable: false),
+                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Barcode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ServingSize = table.Column<double>(type: "float", nullable: false),
+                    PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DateAdded = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FoodCategories", x => x.Id);
+                    table.PrimaryKey("PK_Food", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -168,6 +178,29 @@ namespace PowerTracker.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Diets",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FoodId = table.Column<int>(type: "int", nullable: false),
+                    QuantityInGrams = table.Column<double>(type: "float", nullable: false),
+                    Calories = table.Column<double>(type: "float", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Diets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Diets_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Goals",
                 columns: table => new
                 {
@@ -178,7 +211,7 @@ namespace PowerTracker.Migrations
                     TargetWeight = table.Column<double>(type: "float", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -203,7 +236,7 @@ namespace PowerTracker.Migrations
                     DurationMinutes = table.Column<int>(type: "int", nullable: false),
                     WeightInKg = table.Column<double>(type: "float", nullable: false),
                     CaloriesBurned = table.Column<double>(type: "float", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -214,63 +247,6 @@ namespace PowerTracker.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Foods",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CaloriesPer100g = table.Column<double>(type: "float", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Foods", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Foods_FoodCategories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "FoodCategories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Diets",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
-                    FoodId = table.Column<int>(type: "int", nullable: false),
-                    QuantityInGrams = table.Column<double>(type: "float", nullable: false),
-                    Calories = table.Column<double>(type: "float", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Diets", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Diets_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Diets_FoodCategories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "FoodCategories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Diets_Foods_FoodId",
-                        column: x => x.FoodId,
-                        principalTable: "Foods",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -313,24 +289,9 @@ namespace PowerTracker.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Diets_CategoryId",
-                table: "Diets",
-                column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Diets_FoodId",
-                table: "Diets",
-                column: "FoodId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Diets_UserId",
                 table: "Diets",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Foods_CategoryId",
-                table: "Foods",
-                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Goals_UserId",
@@ -364,6 +325,9 @@ namespace PowerTracker.Migrations
                 name: "Diets");
 
             migrationBuilder.DropTable(
+                name: "Food");
+
+            migrationBuilder.DropTable(
                 name: "Goals");
 
             migrationBuilder.DropTable(
@@ -373,13 +337,7 @@ namespace PowerTracker.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Foods");
-
-            migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "FoodCategories");
         }
     }
 }

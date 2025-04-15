@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Търсене на храна";
+}
+
+<h2>Търсене на храна</h2>
+
+<form asp-action="Search" method="get">
+    <div class="form-group">
+        <input type="text" name="query" class="form-control" placeholder="Въведи име на храна..." />
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Търси</button>
+</form>
+
+@if (ViewBag.ExampleQueries != null)
+{
+    <p>Примерни заявки:</p>
+    <ul>
+        @foreach (var example in ViewBag.ExampleQueries as List<string>)
+        {
+            <li>@example</li>
+        }
+    </ul>
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @Html.ValidationSummary()
+    </div>
+}
