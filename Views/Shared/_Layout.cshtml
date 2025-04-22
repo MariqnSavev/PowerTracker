@@ -35,7 +35,7 @@
                             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Trainings" ? "active" : "")" asp-controller="Trainings" asp-action="Index">Trainings</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Diets" ? "active" : "")" asp-controller="Diets" asp-action="Index">Diets</a>
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Foods" ? "active" : "")" asp-controller="Foods" asp-action="Index">Foods</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Goals" ? "active" : "")" asp-controller="Goals" asp-action="Index">Goals</a>
@@ -68,7 +68,7 @@
 
     <!-- Основно съдържание -->
     <main class="container py-4">
-        @RenderBody() <!-- Връзка за рендиране на всяка страница -->
+        @RenderBody()
     </main>
 
     <!-- Футър -->

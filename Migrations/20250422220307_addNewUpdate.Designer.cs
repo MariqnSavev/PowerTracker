@@ -12,8 +12,8 @@ using PowerTracker.Data;
 namespace PowerTracker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250415184928_NewDatabaseUpdateApi23")]
-    partial class NewDatabaseUpdateApi23
+    [Migration("20250422220307_addNewUpdate")]
+    partial class addNewUpdate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -226,36 +226,6 @@ namespace PowerTracker.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PowerTracker.Models.Diet", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<double>("Calories")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("FoodId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("QuantityInGrams")
-                        .HasColumnType("float");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Diets");
-                });
-
             modelBuilder.Entity("PowerTracker.Models.Food", b =>
                 {
                     b.Property<int>("Id")
@@ -297,9 +267,11 @@ namespace PowerTracker.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Food");
                 });
@@ -428,12 +400,13 @@ namespace PowerTracker.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PowerTracker.Models.Diet", b =>
+            modelBuilder.Entity("PowerTracker.Models.Food", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

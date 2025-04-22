@@ -1,28 +1,42 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PowerTracker.Data;
 using PowerTracker.Models;
 using PowerTracker.Services;
+using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace PowerTracker.Controllers
 {
+    [Authorize]
     public class FoodsController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly INutritionixService _nutritionixService;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public FoodsController(ApplicationDbContext context, INutritionixService nutritionixService)
+        public FoodsController(
+            ApplicationDbContext context,
+            INutritionixService nutritionixService,
+            UserManager<IdentityUser> userManager)
         {
             _context = context;
             _nutritionixService = nutritionixService;
+            _userManager = userManager;
         }
 
         // GET: Foods
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var foods = _context.Food.OrderByDescending(f => f.DateAdded).ToList();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var foods = await _context.Food
+                .Where(f => f.UserId == userId)
+                .OrderByDescending(f => f.DateAdded)
+                .ToListAsync();
 
             ViewData["TotalCalories"] = foods.Sum(f => f.Calories);
             ViewData["TotalProtein"] = foods.Sum(f => f.Protein);
@@ -45,9 +59,11 @@ namespace PowerTracker.Controllers
         {
             if (ModelState.IsValid)
             {
-                food.DateAdded = DateTime.Now;
-                _context.Add(food);
+                food.UserId = _userManager.GetUserId(User);
+                food.DateAdded = DateTime.UtcNow;
+                _context.Food.Add(food);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             return View(food);
@@ -59,7 +75,7 @@ namespace PowerTracker.Controllers
             if (id == null) return NotFound();
 
             var food = await _context.Food.FindAsync(id);
-            if (food == null) return NotFound();
+            if (food == null || food.UserId != _userManager.GetUserId(User)) return Unauthorized();
 
             return View(food);
         }
@@ -75,12 +91,13 @@ namespace PowerTracker.Controllers
             {
                 try
                 {
+                    food.UserId = _userManager.GetUserId(User); // запази същия UserId
                     _context.Update(food);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Food.Any(e => e.Id == food.Id)) return NotFound();
+                    if (!_context.Food.Any(f => f.Id == id)) return NotFound();
                     throw;
                 }
                 return RedirectToAction(nameof(Index));
@@ -93,8 +110,9 @@ namespace PowerTracker.Controllers
         {
             if (id == null) return NotFound();
 
-            var food = await _context.Food.FirstOrDefaultAsync(m => m.Id == id);
-            if (food == null) return NotFound();
+            var food = await _context.Food
+                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == _userManager.GetUserId(User));
+            if (food == null) return Unauthorized();
 
             return View(food);
         }
@@ -105,11 +123,10 @@ namespace PowerTracker.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var food = await _context.Food.FindAsync(id);
-            if (food != null)
-            {
-                _context.Food.Remove(food);
-                await _context.SaveChangesAsync();
-            }
+            if (food == null || food.UserId != _userManager.GetUserId(User)) return Unauthorized();
+
+            _context.Food.Remove(food);
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -124,7 +141,6 @@ namespace PowerTracker.Controllers
             }
 
             var result = await _nutritionixService.SearchFoodAsync(query);
-
             if (result == null)
             {
                 TempData["Error"] = "Храна не е намерена.";
@@ -141,7 +157,8 @@ namespace PowerTracker.Controllers
                 Brand = result.BrandName,
                 ServingSize = result.ServingWeightGrams,
                 PhotoUrl = result.Photo,
-                DateAdded = DateTime.Now
+                DateAdded = DateTime.UtcNow,
+                UserId = _userManager.GetUserId(User)
             };
 
             _context.Food.Add(food);

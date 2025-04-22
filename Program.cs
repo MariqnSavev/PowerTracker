@@ -46,10 +46,10 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 6. Маршрутизация – задаваме начална страница към FoodsController
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Foods}/{action=Index}/{id?}");
+   pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
 
